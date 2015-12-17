@@ -1,0 +1,90 @@
+<?php
+// $Id$
+/**
+ * @file swipht_gui.module
+ * Custom module that modifies different aspects of the Drupal
+ * system to extend the gui elements of the site.
+ * 
+ */
+
+/**
+  *  Valid permissions for this module
+  *  @return array An array of valid permissions for the module
+  */
+function swipht_gui_perm() {
+  return array();
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function swipht_gui_menu() {
+
+  $items = array();
+  
+  return $items;
+}
+
+/**
+ * Implementation of the css hook to add icons to the admin module.
+ */
+
+function swipht_gui_init() {
+    if (arg(0) == 'admin'){
+        drupal_add_css(drupal_get_path('module','swipht_gui').'/css/swipht_gui.css','module','screen');
+        drupal_add_css(drupal_get_path('module','swipht_gui').'/css/swipht_gui_admin.css', 'module', 'screen');
+    }
+    if (arg(0) == 'node' && arg(1) == 'add') {
+        drupal_add_css(drupal_get_path('module','swipht_gui').'/css/swipht_node_gui.css', 'module', 'screen');
+    }
+    
+}
+
+
+
+function swipht_gui_form_alter(&$form, $form_state, $form_id) {
+  /*
+  // little debug field to list form ids.
+  $form['tempname'] = array(
+    '#title' => t('form name'),
+    '#type' => 'textfield',
+    '#value' => $form_id,
+    '#weight' => '-15',
+   );
+  */
+  
+  
+  /* remove the preview and teaser button */
+  
+  switch ($form_id) {
+    case 'page_node_form':
+    case 'story_node_form':
+    case 'book_node_form':
+    case 'webform_node_form':
+    case 'project_node_form':
+    case 'blog_node_form':
+    case 'gallery_node_form':
+    case 'image_node_form':
+    case 'video_node_form':
+    case 'quote_node_form':
+        drupal_add_css(drupal_get_path('module', 'swipht_gui').'/css/swipht_gui_admin.css', 'module', 'screen');
+        
+        $form['buttons']['preview'] = array();
+        $form['preview'] = array();
+        if ($form['body_field']) {
+          $form['body_field']['teaser_include'] = array();
+        }
+      break;
+  };
+  
+  
+}
+
+
+/*
+function swipht_gui_preprocess_page(&$vars) {
+  if (arg(0) == 'admin'){
+    $vars['head'] = '<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />'.$vars['head'];
+  }
+}
+*/

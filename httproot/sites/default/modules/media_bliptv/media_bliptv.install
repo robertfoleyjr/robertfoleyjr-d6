@@ -1,0 +1,58 @@
+<?php
+// $Id: media_bliptv.install,v 1.1.2.1 2010/04/21 19:10:41 aaron Exp $
+
+/**
+ * @file
+ * This is Media: BlipTV's installation, configuration, and removal file.
+ */
+
+/**
+ * Implementation of hook_install().
+ */
+function media_bliptv_install() {
+  // Ensure we have the required variable namespace.
+  drupal_load('module', 'media_bliptv');
+
+  // Convert variables to the Media: BlipTV variable namespace.
+  $ret = array();
+  $flag = FALSE;
+
+  $variables = array(
+    'emvideo_bliptv_rss_tag' => 'rss_tag',
+    'emvideo_bliptv_rss_format' => 'rss_format',
+  );
+
+  foreach ($variables as $old_variable => $new_variable) {
+    $new_value = media_bliptv_variable_get($new_variable);
+    $old_value = variable_get($old_variable, $new_value);
+
+    if (is_array($old_value)) {
+      $old_value = array_pop($old_value);
+    }
+
+    // Set the variable to the value of the old version of emfield,
+    // assuming it hasn't already been overridden, and the old version is not
+    // the current default.
+    if (($new_value == media_bliptv_variable_default($new_variable)) && ($new_value != $old_value)) {
+      media_bliptv_variable_set($new_variable, $old_value);
+    }
+    variable_del($old_variable);
+    $flag = TRUE;
+  }
+
+  if ($flag) {
+    $ret[] = array('success' => TRUE, 'query' => "Converted old variables to the Media: BlipTV variable namespace.");
+  }
+
+  return $ret;
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function media_bliptv_uninstall() {
+  foreach (media_bliptv_variable_default() as $variable => $value) {
+    media_bliptv_variable_del($variable);
+  }
+  return array(array('success' => TRUE, 'query' => "Deleted all variables in the Media: BlipTV namespace."));
+}

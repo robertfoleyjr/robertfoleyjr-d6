@@ -1,0 +1,13 @@
+;$Id: feedapi_mapper.info,v 1.2.2.2 2009/08/07 14:07:44 aronnovak Exp $
+name = FeedAPI Mapper
+description = "Maps feed item elements to node fields."
+dependencies[] = feedapi
+dependencies[] = ctools
+package = FeedAPI Add On
+core = 6.x
+; Information added by drupal.org packaging script on 2009-11-18
+version = "6.x-2.0-alpha4"
+core = "6.x"
+project = "feedapi_mapper"
+datestamp = "1258572983"
+

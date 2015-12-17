@@ -1,0 +1,7 @@
+; $Id: views_filter_taxonomy_depth.info,v 1.0 2009/02/26 18:05:14 maijs Exp $
+name = Views Filter Taxonomy Depth
+description = Views Filter Taxonomy Depth by agentrickard
+package = Views
+dependencies[] = views
+dependencies[] = taxonomy
+core = 6.x

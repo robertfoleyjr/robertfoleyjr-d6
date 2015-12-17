@@ -1,0 +1,20 @@
+<?php
+
+include_once('swipht_blog.features.inc');
+
+/**
+ * @file
+ * Module definition for views_xml
+ *
+ * @see views_xml.views.inc
+ */
+
+/*
+ *disabling for now.
+function swipht_blog_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'swipht_blog'), 
+  );
+}
+*/

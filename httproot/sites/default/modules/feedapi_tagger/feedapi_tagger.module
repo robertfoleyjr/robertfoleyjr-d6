@@ -1,0 +1,75 @@
+<?php
+// $Id: feedapi_tagger.module,v 1.1 2009/09/22 22:54:48 alexb Exp $
+/**
+ * @file
+ * Hook definitions for feedapi tagger.
+ */
+
+/**
+ * Implementation of hook_help().
+ */
+function feedapi_tagger_help($path, $arg) {
+  switch ($path) {
+    case 'admin/modules#description':
+      return t('FeedAPI tagger tags items with terms that it finds in a vocab.');
+    case 'feedapi/full_name':
+      return t('FeedAPI Tagger');
+  }
+}
+
+/**
+ * Implementation of hook_feedapi_feed().
+ */
+function feedapi_tagger_feedapi_feed($op) {
+  $args = func_get_args();
+  switch ($op) {
+    case 'type':
+      return array("XML feed");
+    case 'compatible':
+      // @todo: determine compatibility.
+      return TRUE;
+    case 'parse':
+      $feed = $args[1];
+      if (is_object($feed)) {
+        if (isset($feed->items)) {
+          return feedapi_tagger_tag($feed);
+        }
+        else {
+          drupal_set_message(t('Use feedapi_tagger as secondary parser together with another parser.'), 'error');
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implementation of hook_feedapi_settings_form().
+ */
+function feedapi_tagger_feedapi_settings_form($type) {
+  $form = array();
+  switch ($type) {
+    case 'parsers':
+      $vocabulary = taxonomy_get_vocabularies();
+      $options = array();
+      foreach ($vocabulary as $vid => $voc) {
+        $options[$vid] = $voc->name;
+      }
+      $form['vocabulary'] = array(
+        '#type' => 'select',
+        '#title' => t('Look-up vocabulary'),
+        '#default_value' => key($options),
+        '#options' => $options,
+        '#description' => t('Select the vocabulary to look up terms from.'),
+      );
+      break;
+  }
+  return $form;
+}
+
+/**
+ * Entry point for tagging.
+ */
+function feedapi_tagger_tag($feed) {
+  module_load_include('inc', 'feedapi_tagger', 'feedapi_tagger');
+  _feedapi_tagger_tag($feed);
+}

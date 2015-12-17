@@ -1,0 +1,11 @@
+name = Field Tool
+description = An API for programmatically accessing fields of objects in a generic way.
+core = 6.x
+php = 5.2
+
+; Information added by drupal.org packaging script on 2011-02-25
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "fieldtool"
+datestamp = "1298619253"
+

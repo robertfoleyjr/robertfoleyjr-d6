@@ -1,0 +1,61 @@
+/*
+ example css classe names for module icons
+ standard icon size is: 30px x 30px
+ 
+.path-admin-content-comment span.icon {
+}
+
+.path-admin-content-taxonomy span.icon {
+}
+
+.path-admin-content-modulename span.icon {
+  background: transparent url('modulename_icon.png') no-repeat;
+}
+
+
+*/
+
+/* webform icon */
+.path-admin-content-webform span.icon, .path-admin-settings-webform span.icon {
+  background: transparent url('../images/webform_icon.png') no-repeat !important;
+}
+
+/* content management filter */
+
+.path-admin-content-filter span.icon, .path-admin-settings-module_filter span.icon {
+  background: transparent url('../images/filter_icon.png') no-repeat !important;
+}
+
+/* admin menu icon */
+
+.path-admin-settings-admin_menu span.icon {
+  background: transparent url('../images/admin_menu_icon.png') no-repeat !important;
+}
+
+/* jquery update */
+
+.path-admin-settings-jquery_update span.icon {
+  background: transparent url('../images/jquery_icon.png') no-repeat !important;
+}
+
+/* login toboggan */
+
+.path-admin-user-logintoboggan span.icon {
+  background: transparent url('../images/logintoboggan_icon.png') no-repeat !important;
+}
+
+/** sitemap icon */
+
+.path-admin-settings-sitemap span.icon {
+  background: transparent url('../images/sitemap_icon.png') no-repeat !important;
+}
+
+/** embedded media icon */
+.path-admin-content-emfield span.icon {
+  background: transparent url('../images/embeddedmedia_icon.png') no-repeat !important;
+}
+
+/** embedded media icon */
+.path-admin-settings-menu_attributes span.icon {
+  background: transparent url('../images/menu_attributes_icon.png') no-repeat !important;
+}

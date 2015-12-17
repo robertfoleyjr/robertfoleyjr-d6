@@ -1,0 +1,23 @@
+<?php
+// $Id$
+
+/** 
+  * @file robertfoley_migrate.install
+  * This file provides the install and uninstall for the module.
+ **/
+
+function robertfoley_migrate_install() {
+  
+}
+
+function robertfoley_migrate_uninstall() {
+
+}
+
+function robertfoley_migrate_enable() {
+
+}
+
+function robertfoley_migrate_disable() {
+
+}

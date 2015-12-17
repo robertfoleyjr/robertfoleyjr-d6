@@ -1,0 +1,16 @@
+; $Id: swiphtbase.info,v 1.5 2007/07/01 23:27:32 goba Exp $
+name = Carbon
+description = Tableless, multi-column, fluid width theme.
+version = VERSION
+core = 6.x
+engine = phptemplate
+stylesheets[all][] = "css/style.css"
+stylesheets[print][] = "css/print.css"
+stylesheets[all][] = "css/modalframe.parent.css"
+stylesheets[all][] = "css/parent.css"
+
+; Information added by drupal.org packaging script on 2009-05-13
+version = "6.x"
+project = "drupal"
+datestamp = "1242243950"
+

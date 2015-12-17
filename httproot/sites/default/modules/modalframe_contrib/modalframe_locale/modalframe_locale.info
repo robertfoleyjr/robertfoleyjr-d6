@@ -1,0 +1,14 @@
+; $Id: modalframe_locale.info,v 1.1.2.1 2010/01/03 13:14:55 markuspetrux Exp $
+name = Modal Frame Locale
+description = Opens string related forms implemented by the translation search interface in modal frames.
+package = Modal frame
+dependencies[] = modalframe
+dependencies[] = locale
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-01-18
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "modalframe_contrib"
+datestamp = "1263773383"
+

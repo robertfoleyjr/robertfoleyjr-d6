@@ -1,0 +1,19 @@
+
+/**
+ * @file
+ * Provides all the styling for the TweetMeme integration.
+ */
+
+/**
+ * Styling for the button.
+ */
+.tweetmeme-button {
+  float: right;
+}
+
+/**
+ * Override styling from Drupal for the TweetMeme widget.
+ */
+#tweetmeme_widget ul li, #tweetmeme_widget ul.menu li, #tweetmeme_widget .item-list ul li, #tweetmeme_widget li.leaf {
+  background: none;
+}

@@ -1,0 +1,12 @@
+name = "IMCE Mkdir"
+description = "Allows users manage directories in IMCE"
+core = "6.x"
+dependencies[] = imce
+
+
+; Information added by drupal.org packaging script on 2011-10-20
+version = "6.x-1.2"
+core = "6.x"
+project = "imce_mkdir"
+datestamp = "1319103333"
+

@@ -1,0 +1,13 @@
+name = Path redirect
+description = Redirect users from one URL to another.
+core = 6.x
+enhances[] = pathauto
+suggests[] = global_redirect
+recommends[] = elements
+
+; Information added by drupal.org packaging script on 2011-05-20
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "path_redirect"
+datestamp = "1305851641"
+

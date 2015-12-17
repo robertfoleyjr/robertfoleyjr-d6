@@ -1,0 +1,21 @@
+/* 
+    Document   : swipht_node_gui
+    Created on : May 26, 2010, 8:11:17 PM
+    Author     : robert
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+table td.content-multiple-drag {
+    width: 10px !important;
+}
+
+input.fluid  {
+    width: 95% !important;
+}
+

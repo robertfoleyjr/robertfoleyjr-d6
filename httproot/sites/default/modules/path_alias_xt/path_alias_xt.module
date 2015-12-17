@@ -1,0 +1,169 @@
+<?php
+// $Id: path_alias_xt.module,v 1.4 2010/04/12 03:21:41 rdeboer Exp $
+
+/**
+ * @file
+ *  Extended Path Aliases.
+ *
+ *  Automatically generates and recognises aliases beyond the base path, e.g.
+ *  generates and accepts "about-us/edit" for "node/123/edit" and "user/rik/track"
+ *  for "user/7/track".
+ *  These aliases may be used anywhere where you are prompted to enter page
+ *  specifications, including wildcards, like "about-us*".
+ *  Examples of modules and pages that particularly benefit are:
+ *  o any page displaying a revision or links to revisions
+ *  o any page with View, Edit, Track etc tabs
+ *  o the tabs on the "My account" page, Edit, Track etc.
+ *  o Statistics on top visited pages etc.
+ *  o the page-specific block visibility settings at Site building >> Blocks >> configure
+ *  o same for any other module that has an include/exclude pages input box, e.g
+ *    the Smart menus, Smart tabs modules
+ */
+
+define('PATH_ALIAS_XT_NODE_OR_USER_MATCH', '/(^node\/[0-9]+?|^user\/[0-9]+?)\/(.*)/');
+// Note the ? in above pattern to force lazy (as opposed to eager) match on first slash
+
+/**
+ * Implementation of hook_boot().
+ *
+ * The mere presence of this empty-bodied hook, guarantees that the functions
+ * in this module, in particular custom_url_rewrite_inbound, are known to core
+ * just in time. Important for path.inc/drupal_get_normal_path().
+ */
+function path_alias_xt_boot() {
+  return;
+}
+
+/**
+ * Implementation of hook_help().
+ */
+function path_alias_xt_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#path_alias_xt':
+      $s = t('Installation instructions are in the README.txt file. Further documentation is on the <a href="@path_alias_xt">Extended Path Aliases</a> project page.',
+        array('@path_alias_xt' => url('http://drupal.org/project/path_alias_xt')));
+      break;
+  }
+  return empty($s) ? '' : '<p>'. $s .'</p>';
+}
+
+/**
+ * This is used to override the call drupal_get_path_alias(), which occurs
+ * for instance in the block.module. There is no hook available for this.
+ *
+ * @param $path
+ * @param $path_language
+ * @return string
+ *   The alias for $path or $path if no alias was found.
+ */
+function path_alias_xt_get_path_alias($path, $path_language = '') {
+  if ($alias = drupal_lookup_path('alias', $path, $path_language)) {
+    return $alias;
+  }
+  if (preg_match(PATH_ALIAS_XT_NODE_OR_USER_MATCH, $path, $matches)) {
+    if ($alias = drupal_lookup_path('alias', $matches[1], $path_language)) {
+      return "$alias/$matches[2]";
+    }
+  }
+  return $path;
+}
+
+/**
+ * Implementation of pseudo-hook custom_url_rewrite_inbound().
+ *
+ * Because we modify drupal_get_path_alias(), we also have to implement the
+ * complimentary action in drupal_get_normal_path().
+ * Fortunately, while drupal_get_path_alias() can't be overridden,
+ * drupal_get_normal_path() does let us override its behaviour by implementing
+ * custom_url_rewrite_inbound().
+ *
+ * @param $result
+ *   The internal path as calculated and passed to us by drupal_get_normal_path().
+ *   When no alternative internal path was found by that function, we apply our
+ *   algorithm to create an internal (aka normal) path.
+ * @param $path
+ *   The original path or its alias.
+ * @param $path_language
+ *
+ * @see includes/path.inc
+ */
+function custom_url_rewrite_inbound(&$result, $path, $path_language) {
+  if (!empty($path) && $result == $path) { // drupal_get_normal_path() did not find an alias
+    // If the path exists as a menu item (incl. paged views), abort.
+    if (_path_alias_xt_get_menu_item($path)) {
+      return;
+    }
+    $candidate_alias = $path;
+    while ($pos = strrpos($candidate_alias, '/')) {
+      $candidate_alias = substr($candidate_alias, 0, $pos);
+      if ($src = drupal_lookup_path('source', $candidate_alias, $path_language)) {
+        $result = $src . substr($path, $pos);
+        return;
+      }
+    }
+  }
+}
+
+function _path_alias_xt_get_menu_item($path) {
+  return db_result(db_query("SELECT path FROM {menu_router} WHERE path='%s'", $path));
+}
+
+/**
+ * Implementation of pseudo-hook custom_url_rewrite_outbound().
+ *
+ * This gets called from url($path). If path_alias_xt has been properly
+ * installed, i.e. the body of drupal_get_path_alias() has been manually or
+ * programmatically (PECL runkit) overridden, then this function is effectively
+ * a NO-OP, as drupal_get_path_alias will have done the work already.
+ * If Domain Access (or another module implementing it) is enabled, we make sure
+ * not to implement it here, to avoid a clash. This means that with Domain
+ * Access enabled, the body of drupal_get_path_alias() should definitely be
+ * overridden, as described in the README.
+ *
+ * @see includes/common.inc
+ *
+ * @param $path
+ *   The path as calculated and passed to us by the function url().
+ *   If no alias was found by that function, using drupal_get_path_alias(),
+ *   which we override with a call to path_alias_xt_get_path_alias(), we apply
+ *   our algorithm for assembly of the extended path alias.
+ * @param $options
+ * @param $original_path
+ */
+if (!function_exists('custom_url_rewrite_outbound')) {
+
+  function custom_url_rewrite_outbound(&$path, &$options, $original_path) {
+    if ($path == $original_path && preg_match(PATH_ALIAS_XT_NODE_OR_USER_MATCH, $path, $matches)) {
+      // Provided drupal_get_path_alias() has been overridden to call
+      // path_alias_xt_get_path_alias() (manually or via the runkit), this code
+      // won't be reached. It's here just in case the override is omitted.
+      if ($alias = drupal_lookup_path('alias', $matches[1], $path_language)) {
+        $path = "$alias/$matches[2]";
+      }
+    }
+  }
+}
+
+// Purists look away...
+// There is no suitable hook to override core's drupal_get_path_alias()
+// behaviour. So we either take on the impossible task of rewriting all modules
+// that call it, or we redefine its body to make a simple call back to this
+// module. We can do this programmatically by taking advantage of the PECL
+// runkit extension. The runkit needs to be compiled and placed in the
+// /extensions (or /ext) directory pointed to by the extension_dir directive in
+// php.ini
+
+// Dynamically load the runkit. This may not be supported on multi-threaded web
+// servers.
+// If the line below produces an error on your system, comment it out and make
+// sure that you have "extension=runkit.so" in your php.ini. Alternatively,
+// apply the simple edit to includes/path.inc as described in the README file.
+//dl('runkit.so');
+
+function path_alias_xt_init() {
+  if (function_exists('runkit_function_redefine') /* && function_exists('drupal_get_path_alias')*/) {
+    $args = '$path, $path_language=""';
+    $body = 'return path_alias_xt_get_path_alias($path, $path_language);';
+    runkit_function_redefine('drupal_get_path_alias', $args, $body);
+  }
+}

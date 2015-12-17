@@ -1,0 +1,545 @@
+# $Id: captcha_pack-module.pot,v 1.1 2010/02/01 10:24:34 soxofaan Exp $
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  ascii_art_captcha.admin.inc,v 1.2 2007/12/22 15:24:31 soxofaan
+#  css_captcha.admin.inc,v 1.1 2007/12/22 14:10:43 soxofaan
+#  ascii_art_captcha.module,v 1.7 2009/05/21 17:32:28 soxofaan
+#  css_captcha.module,v 1.12 2009/09/05 15:17:28 soxofaan
+#  ascii_art_captcha.info,v 1.2 2007/12/22 13:41:02 soxofaan
+#  css_captcha.info,v 1.5 2007/12/22 14:10:43 soxofaan
+#  foo_captcha.info,v 1.4 2008/02/13 22:01:24 soxofaan
+#  math_captcha.info,v 1.4 2007/12/22 15:13:09 soxofaan
+#  random_captcha_type.info,v 1.4 2008/02/13 22:11:40 soxofaan
+#  lost_character_captcha.info,v 1.4 2007/12/22 15:55:12 soxofaan
+#  phrase_captcha.info,v 1.4 2008/02/13 21:39:52 soxofaan
+#  word_list_captcha.info,v 1.4 2008/02/13 21:13:00 soxofaan
+#  foo_captcha.module,v 1.11 2009/05/21 18:00:44 soxofaan
+#  math_captcha.admin.inc,v 1.2 2010/01/24 20:38:47 soxofaan
+#  math_captcha.challenge.inc,v 1.4 2009/07/24 16:14:48 soxofaan
+#  math_captcha.module,v 1.6 2008/04/07 22:55:02 soxofaan
+#  random_captcha_type.admin.inc,v 1.1 2008/02/13 22:32:15 soxofaan
+#  random_captcha_type.module,v 1.15 2009/08/18 23:26:30 soxofaan
+#  text_captcha.inc,v 1.3 2007/12/22 15:55:12 soxofaan
+#  lost_character_captcha.admin.inc,v 1.1 2008/02/07 08:54:56 soxofaan
+#  lost_character_captcha.module,v 1.9 2009/06/26 19:48:53 soxofaan
+#  phrase_captcha.admin.inc,v 1.1 2008/02/13 21:51:51 soxofaan
+#  word_list_captcha.admin.inc,v 1.1 2008/02/13 21:17:45 soxofaan
+#  phrase_captcha.inc,v 1.1 2008/02/13 21:51:51 soxofaan
+#  phrase_captcha.module,v 1.12 2008/04/07 22:55:03 soxofaan
+#  word_list_captcha.module,v 1.12 2008/04/07 22:55:03 soxofaan
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2010-02-01 11:16+0100\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:12 css_captcha/css_captcha.admin.inc:16
+msgid "Code length"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:18
+msgid "Font"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:21
+msgid "Define the ASCII art font to use. Note that some characters are not very recognizable in some (small/weird) fonts. Make sure to disable the right character sets in these cases."
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:24
+msgid "default"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:30
+msgid "Font size"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:33
+msgid "Set the font size for the ASCII art."
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:39
+msgid "upper case characters"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:40
+msgid "lower case characters"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:41
+msgid "digits"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:44
+msgid "Enable the character sets to use in the code. Choose wisely by taking the recognizability of the used font into account."
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.admin.inc:55
+msgid "You should select at least one type of characters to use."
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.module:10
+msgid "The ASCII art CAPTCHA shows a random character code in ASCII art style. Example with current settings:"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.module:98 css_captcha/css_captcha.module:87
+msgid "Enter the code above"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.module:102
+msgid "Enter the code depicted in ASCII art style."
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.module:23 ascii_art_captcha/ascii_art_captcha.info:0
+msgid "ASCII art CAPTCHA"
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.info:0
+msgid "Provides an ASCII art based CAPTCHA type."
+msgstr ""
+
+#: ascii_art_captcha/ascii_art_captcha.info:0 css_captcha/css_captcha.info:0 foo_captcha/foo_captcha.info:0 math_captcha/math_captcha.info:0 random_captcha_type/random_captcha_type.info:0 text_captcha/lost_character_captcha/lost_character_captcha.info:0 text_captcha/phrase_captcha/phrase_captcha.info:0 text_captcha/word_list_captcha/word_list_captcha.info:0
+msgid "Spam control"
+msgstr ""
+
+#: css_captcha/css_captcha.admin.inc:11
+msgid "Characters to use in the code"
+msgstr ""
+
+#: css_captcha/css_captcha.admin.inc:29
+msgid "The list of characters to use should not contain spaces."
+msgstr ""
+
+#: css_captcha/css_captcha.module:14
+msgid "The CSS CAPTCHA uses CSS tricks to obfuscate a random text code for spam bots. The characters of the code are scrambled in the HTML markup but are displayed in the correct order when rendered with a CSS capable browser."
+msgstr ""
+
+#: css_captcha/css_captcha.module:92
+msgid "Enter the code without spaces."
+msgstr ""
+
+#: css_captcha/css_captcha.module:24 css_captcha/css_captcha.info:0
+msgid "CSS CAPTCHA"
+msgstr ""
+
+#: css_captcha/css_captcha.info:0
+msgid "Provides a CSS based CAPTCHA type."
+msgstr ""
+
+#: foo_captcha/foo_captcha.module:10
+msgid "This is a very simple CAPTCHA, which requires users to enter \"foo\" in a textfield."
+msgstr ""
+
+#: foo_captcha/foo_captcha.module:36
+msgid "Ignore spaces in the response"
+msgstr ""
+
+#: foo_captcha/foo_captcha.module:56
+msgid "Enter \"foo\""
+msgstr ""
+
+#: foo_captcha/foo_captcha.module:20 foo_captcha/foo_captcha.info:0
+msgid "Foo CAPTCHA"
+msgstr ""
+
+#: foo_captcha/foo_captcha.info:0
+msgid "The foo CAPTCHA requires the user to enter the word 'foo'."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:12
+msgid "Enabled math challenges"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:14
+msgid "Addition: x + y = z"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:15
+msgid "Subtraction: x - y = z"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:16
+msgid "Multiplication: x * y = z"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:19
+msgid "Select the math challenges you want to enable."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:23
+msgid "Textual representation of numbers"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:25
+msgid "When enabled, the numbers in the challenge will get a textual representation if available. E.g. \"four\" instead of \"4\"."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:29
+msgid "Textual representation of operators"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:31
+msgid "When enabled, the operators in the challenge will get a textual representation if available. E.g. \"plus\" instead of \"+\"."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:36
+msgid "Addition challenge: x + y = z"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:40;57;74
+msgid "Maximum value for x and y"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:47;64;81
+msgid "Allow negative values."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:53
+msgid "Subtraction challenge: x - y = z"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:70
+msgid "Multiplication challenge: x * y = z"
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:95
+msgid "You should select at least one type of math challenges."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:101
+msgid "Maximum value should be an integer."
+msgstr ""
+
+#: math_captcha/math_captcha.admin.inc:106
+msgid "Maximum value should be an integer and at least 2"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:63
+msgid "Math question"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:67
+msgid "Solve this math question and enter the solution with digits. E.g. for \"two plus four = ?\" enter \"6\"."
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:96
+msgid "zero"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:96
+msgid "one"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:96
+msgid "two"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:96
+msgid "three"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:97
+msgid "four"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:97
+msgid "five"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:97
+msgid "six"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:97
+msgid "seven"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:97
+msgid "eight"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:98
+msgid "nine"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:98
+msgid "ten"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:98
+msgid "eleven"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:98
+msgid "twelve"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:99
+msgid "thirteen"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:99
+msgid "fourteen"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:99
+msgid "fifteen"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:104
+msgid "minus !number"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:119
+msgid "plus"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:119
+msgid "minus"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:119
+msgid "times"
+msgstr ""
+
+#: math_captcha/math_captcha.challenge.inc:119
+msgid "equals"
+msgstr ""
+
+#: math_captcha/math_captcha.module:14 math_captcha/math_captcha.info:0
+msgid "Math CAPTCHA"
+msgstr ""
+
+#: math_captcha/math_captcha.info:0
+msgid "Provide math CAPTCHAs like 'two + three = ?' and '2 times ? = 6'"
+msgstr ""
+
+#: random_captcha_type/random_captcha_type.admin.inc:12
+msgid "You need at least two CAPTCHA types (other than %random_captcha_type)."
+msgstr ""
+
+#: random_captcha_type/random_captcha_type.admin.inc:18
+msgid "Randomly switch between"
+msgstr ""
+
+#: random_captcha_type/random_captcha_type.admin.inc:31
+msgid "You should select at least two CAPTCHA types."
+msgstr ""
+
+#: random_captcha_type/random_captcha_type.module:14
+msgid "This CAPTCHA type is a \"meta\" CAPTCHA type, which randomly picks one of the selected CAPTCHA types."
+msgstr ""
+
+#: random_captcha_type/random_captcha_type.module:25 random_captcha_type/random_captcha_type.info:0
+msgid "Random CAPTCHA type"
+msgstr ""
+
+#: random_captcha_type/random_captcha_type.info:0
+msgid "Provides a 'meta' CAPTCHA that randomly picks a CAPTCHA type."
+msgstr ""
+
+#: text_captcha/text_captcha.inc:37
+msgid "Encountered an illegal byte while splitting an utf8 string in characters."
+msgstr ""
+
+#: text_captcha/text_captcha.inc:86
+msgid "For language %lang_name (code %lang_code)"
+msgstr ""
+
+#: text_captcha/text_captcha.inc:127;138
+msgid "You should provide at least @num words"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.admin.inc:12
+msgid "Number of characters to lose"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.admin.inc:14
+msgid "Select how many characters should be lost in the CAPTCHA."
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.admin.inc:20
+msgid "Put \"%hinter\" where the characters are lost as a hint"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.admin.inc:22
+msgid "Enable this option to make it easier to determine the lost characters."
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.admin.inc:44
+msgid "Losing more than two characters without indication where they are lost could be too hard for a human. Check your settings."
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.module:15
+msgid "The challenge in this CAPTCHA is to determine the lost character(s) of a given word."
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.module:74
+msgid "Enter the missing character from the following word"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.module:77
+msgid "Enter the @num missing characters from the following word"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.module:25
+msgid "Lost characters"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.info:0
+msgid "Lost character CAPTCHA"
+msgstr ""
+
+#: text_captcha/lost_character_captcha/lost_character_captcha.info:0
+msgid "Provides CAPTCHA that asks for the lost character(s) in a given word."
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:10 text_captcha/word_list_captcha/word_list_captcha.admin.inc:8
+msgid "WARNING: this module is not completely ported to Drupal 6 and does not work yet."
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:16
+msgid "Kind of words to use in the CAPTCHA phrase"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:18
+msgid "Generate nonsense words"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:19
+msgid "Use user defined words"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:26
+msgid "User defined word pool"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:27
+msgid "Enter the words to use in the CAPTCHA phrase (space separated, no punctuation)."
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:33
+msgid "Number of words in the CAPTCHA phrase"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:41
+msgid "Maximum number of additional words to let the user choose from"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:48
+msgid "Word selection challenges"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.admin.inc:68
+msgid "You need to select at least one word selection criterium"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:59
+msgid "first"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:59
+msgid "second"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:59
+msgid "third"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:60
+msgid "fourth"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:60
+msgid "fifth"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:60
+msgid "sixth"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:60
+msgid "seventh"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:61
+msgid "eighth"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:61
+msgid "ninth"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:61
+msgid "tenth"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:93
+msgid "What is the @nth word in the CAPTCHA phrase above?"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:99
+msgid "What is the last word in the CAPTCHA phrase above?"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:102
+msgid "What is the @nth last word in the CAPTCHA phrase above?"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:127
+msgid "Which word does not follow the alphabetical order in the CAPTCHA phrase above?"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.inc:142
+msgid "Which word occurs two times in the CAPTCHA phrase above?"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.module:22
+msgid "This phrase based CAPTCHA presents a CAPTCHA phrase of a given number of words and asks to pick the right word (based on counting, alphabetical order, etc)."
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.module:33 text_captcha/phrase_captcha/phrase_captcha.info:0
+msgid "Phrase CAPTCHA"
+msgstr ""
+
+#: text_captcha/phrase_captcha/phrase_captcha.info:0
+msgid "Provides CAPTCHA that requires to pick for the right word/character out of a CAPTCHA phrase."
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.admin.inc:13
+msgid "Number of words in word list"
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.admin.inc:20;27
+msgid "Word pool @num"
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.module:15
+msgid "The unrelated word CAPTCHA consists of a list of closely related words with one non-related word, which the user has to select. To generate this list, two word pools are needed: one for the related words and one for the non-related word."
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.module:77
+msgid "Which word does not belong to the list?"
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.module:26
+msgid "Unrelated word"
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.info:0
+msgid "Word list CAPTCHA"
+msgstr ""
+
+#: text_captcha/word_list_captcha/word_list_captcha.info:0
+msgid "Provides CAPTCHA like 'which word does not belong in the list [green red bird blue]?'."
+msgstr ""
+

@@ -1,0 +1,10 @@
+; $Id: permissions_lock.info,v 1.1 2009/01/17 18:10:23 xeniox Exp $
+name = Permissions Lock
+description = "Lock permissions on the permissions administration pages for certain roles"
+core = 6.x
+; Information added by drupal.org packaging script on 2010-07-08
+version = "6.x-1.2"
+core = "6.x"
+project = "permissions_lock"
+datestamp = "1278587106"
+

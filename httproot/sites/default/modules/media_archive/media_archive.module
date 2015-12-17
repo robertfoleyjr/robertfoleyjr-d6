@@ -1,0 +1,11 @@
+<?php
+// $Id: media_archive.module,v 1.1 2009/07/15 03:21:33 winston Exp $
+
+/**
+ *  @file
+ *  Embedded Audio Field provider file for archive.org audio postings
+ */
+
+function media_archive_emfield_providers($module, $provider = NULL) {
+  return drupal_system_listing("$provider\.inc$", drupal_get_path('module', 'media_archive') ."/providers/$module", 'name', 0);
+}

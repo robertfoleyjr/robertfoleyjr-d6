@@ -1,0 +1,12 @@
+name = "GeSHi node"
+description = "Provides source code node with GeSHi syntax highlighting."
+package = "Filters"
+dependencies[] = geshifilter
+core = 6.x
+
+; Information added by drupal.org packaging script on 2013-01-29
+version = "6.x-1.4+4-dev"
+core = "6.x"
+project = "geshifilter"
+datestamp = "1359421709"
+

@@ -1,0 +1,19 @@
+
+Field Tool 6.x dev, 2010-02-22
+---------------------------------
+
+- #704168 Ability to get a properly-weighted list of fields
+
+Field Tool 6.x Beta 3, 2010-02-16
+---------------------------------
+
+- #649848 Support taxonomy (not content_taxonomy) fields
+- #643596 Support link fields
+- #573144 Support Location module
+- #641104 Fixed caching issue
+- #696270 Support field heirarchies, CCK fieldgroup plugin
+- #707506 Location field heirarchy
+- #644444 Generic callback functions for "leaf" fields (fields with no child fields)
+- #423072 Support import/export callbacks for CCK field types (partial)
+- #713836 Sample implementation of creating entities / saving a modified entity (fieldtool_execute.module)
+- #704306 Extra/child fields for CCK email and link fields

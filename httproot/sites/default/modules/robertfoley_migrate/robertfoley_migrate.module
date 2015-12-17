@@ -1,0 +1,319 @@
+<?php
+// $Id$
+/**
+ * @file robertfoley_migrate.module
+ * Custom module that modifies different aspects of the Drupal
+ * system to extend the gui elements of the site.
+ * 
+ */
+
+/**
+  *  Valid permissions for this module
+  *  @return array An array of valid permissions for the module
+  */
+
+/**/
+function robertfoley_migrate_perm() {
+  return array('access migration');
+}
+
+
+/**
+ * Implementation of hook_menu().
+ */
+/**/
+function robertfoley_migrate_menu() {
+
+  $items = array();
+  /*
+  $items['migration/test'] = array(
+     'title' => t('Project Migration'),
+     'title arguments' => array(),
+     'access arguments' => array('access migration'),
+     'page callback' => 'robertfoley_migrate_primary',
+
+  );
+  */
+  return $items;
+}
+
+
+
+function robertfoley_migrate_primary() {
+    
+    $result_output = '';
+    
+    $project_queue = _get_projects();
+
+    $projectid_stagged = 0;
+
+    while ($project = db_fetch_array($project_queue)) {
+        // project note
+        $result_output = $result_output.'<pre>'.print_r($project,true).'</pre><br />';
+        
+        $current_projectid = $project['ProjectID'];
+        $current_projectdid = $project['destid'];
+
+
+        if ($projectid_stagged !== $current_projectdid) {
+          $field_count = 0;
+          $projectid_stagged = $current_projectdid;
+        }
+
+        // get industries
+        $industry_results = _get_industry($project['ProjectID'],$project['destid']);
+        $field_count = 0;
+
+        while ($industry = db_fetch_array($industry_results)) {
+            // industry note
+            $result_output = $result_output.'<pre>'.print_r($industry,true).'</pre><br />';
+            // insert industries
+            $result_output = $result_output._insert_industry($projectid_stagged, $industry['Idestid'], $field_count);
+            
+             $field_count++;
+        }
+
+
+
+
+        // get medium
+        $medium_results = _get_medium($project['ProjectID'],$project['destid']);
+        $field_count = 0;
+
+        while ($medium = db_fetch_array($medium_results)) {
+            // medium note
+            $result_output = $result_output.'<pre>'.print_r($medium,true).'</pre><br />';
+            // insert medium
+            $result_output = $result_output._insert_medium($projectid_stagged, $medium['Mdestid'], $field_count);
+
+            $field_count++;
+        }
+
+
+
+
+
+        // get service
+        $service_results = _get_service($project['ProjectID'],$project['destid']);
+        $field_count = 0;
+
+        while ($service = db_fetch_array($service_results)) {
+            // service note
+            $result_output = $result_output.'<pre>'.print_r($service,true).'</pre><br />';
+            // insert service
+            $result_output = $result_output._insert_service($projectid_stagged, $service['Sdestid'], $field_count);
+
+            $field_count++;
+        }
+
+
+        // get skill
+        $skill_results = _get_skill($project['ProjectID'],$project['destid']);
+        $field_count = 0;
+
+        while ($skill = db_fetch_array($skill_results)) {
+            // skill note
+            $result_output = $result_output.'<pre>'.print_r($skill,true).'</pre><br />';
+            // insert skill
+            $result_output = $result_output._insert_skill($projectid_stagged, $skill['Sdestid'], $field_count);
+
+            $field_count++;
+        }
+
+
+
+        // get technology
+        $technology_results = _get_technology($project['ProjectID'],$project['destid']);
+        $field_count = 0;
+
+        while ($technology = db_fetch_array($technology_results)) {
+            // technology note
+            $result_output = $result_output.'<pre>'.print_r($technology,true).'</pre><br />';
+            // insert technology
+            $result_output = $result_output._insert_technology($projectid_stagged, $technology['Tdestid'], $field_count);
+
+            $field_count++;
+        }
+    }
+    
+    return $result_output;
+
+}
+
+function _get_projects() {
+
+   return db_query('SELECT tbl_project.ProjectID, migrate_map_project.destid FROM tbl_project inner join migrate_map_project on migrate_map_project.sourceid = tbl_project.ProjectID');
+
+}
+
+function _get_industry($ProjectID,$Pdestid) {
+
+    return db_query('SELECT rel_project_industry.IndustryID, migrate_map_industry.destid AS Idestid FROM rel_project_industry INNER JOIN migrate_map_industry ON rel_project_industry.IndustryID = migrate_map_industry.sourceid WHERE rel_project_industry.ProjectID = %d', $ProjectID);
+    
+}
+
+function _get_medium($ProjectID,$Pdestid) {
+
+    return db_query('SELECT rel_project_medium.MediumID, migrate_map_medium.destid AS Mdestid FROM rel_project_medium INNER JOIN migrate_map_medium ON rel_project_medium.MediumID = migrate_map_medium.sourceid WHERE rel_project_medium.ProjectID = %d', $ProjectID);
+
+}
+
+function _get_service($ProjectID,$Pdestid) {
+
+    return db_query('SELECT rel_project_service.ServiceID, migrate_map_service.destid AS Sdestid FROM rel_project_service INNER JOIN migrate_map_service ON rel_project_service.ServiceID = migrate_map_service.sourceid WHERE rel_project_service.ProjectID = %d', $ProjectID);
+
+}
+
+function _get_skill($ProjectID,$Pdestid) {
+
+    return db_query('SELECT rel_project_skill.SkillID, migrate_map_skill.destid AS Sdestid FROM rel_project_skill INNER JOIN migrate_map_skill ON rel_project_skill.SkillID = migrate_map_skill.sourceid WHERE rel_project_skill.ProjectID = %d', $ProjectID);
+
+}
+
+function _get_technology($ProjectID,$Pdestid) {
+
+    return db_query('SELECT rel_project_technology.TechnologyID, migrate_map_technology.destid AS Tdestid FROM rel_project_technology INNER JOIN migrate_map_technology ON rel_project_technology.TechnologyID = migrate_map_technology.sourceid WHERE rel_project_technology.ProjectID = %d', $ProjectID);
+
+}
+
+
+function _insert_industry($Pdestid, $Pindustryid,$delta) {
+
+    $output = '';
+
+    $stage_one = db_query('INSERT INTO content_field_node_industry (`vid`,`nid`,`delta`,`field_node_industry_value`) VALUES (%d,%d,%d,%d) ON DUPLICATE KEY UPDATE field_node_industry_value = %d',$Pdestid,$Pdestid,$delta,$Pindustryid,$Pindustryid);
+    $output = $output."inserted content_field_node_industry = $Pdestid,$Pdestid,$delta,$Pindustryid <br />";
+
+    $state_two = db_query('INSERT INTO term_node (`nid`,`vid`,`tid`) VALUES (%d,%d,%d)',$Pdestid,$Pdestid,$Pindustryid);
+    $output = $output."Inserted term_node = $Pdestid,$Pdestid,$Pindustryid <br />";
+
+    return $output;
+}
+
+function _insert_medium($Pdestid, $Pmediumid,$delta) {
+
+    $output = '';
+
+    $stage_one = db_query('INSERT INTO content_field_node_medium (`vid`,`nid`,`delta`,`field_node_medium_value`) VALUES (%d,%d,%d,%d) ON DUPLICATE KEY UPDATE field_node_medium_value = %d',$Pdestid,$Pdestid,$delta,$Pmediumid,$Pmediumid);
+    $output = $output."inserted content_field_node_medium = $Pdestid,$Pdestid,$delta,$Pmediumid <br />";
+
+    $state_two = db_query('INSERT INTO term_node (`nid`,`vid`,`tid`) VALUES (%d,%d,%d)',$Pdestid,$Pdestid,$Pmediumid);
+    $output = $output."Inserted term_node = $Pdestid,$Pdestid,$Pmediumid <br />";
+
+    return $output;
+}
+
+function _insert_service($Pdestid, $Pserviceid,$delta) {
+
+    $output = '';
+
+    $stage_one = db_query('INSERT INTO content_field_node_service (`vid`,`nid`,`delta`,`field_node_service_value`) VALUES (%d,%d,%d,%d) ON DUPLICATE KEY UPDATE field_node_service_value = %d',$Pdestid,$Pdestid,$delta,$Pserviceid,$Pserviceid);
+    $output = $output."inserted content_field_node_service = $Pdestid,$Pdestid,$delta,$Pserviceid <br />";
+
+    $state_two = db_query('INSERT INTO term_node (`nid`,`vid`,`tid`) VALUES (%d,%d,%d)',$Pdestid,$Pdestid,$Pserviceid);
+    $output = $output."Inserted term_node = $Pdestid,$Pdestid,$Pserviceid <br />";
+
+    return $output;
+}
+
+function _insert_skill($Pdestid, $Pskillid,$delta) {
+
+    $output = '';
+
+    $stage_one = db_query('INSERT INTO content_field_node_skill (`vid`,`nid`,`delta`,`field_node_skill_value`) VALUES (%d,%d,%d,%d) ON DUPLICATE KEY UPDATE field_node_skill_value = %d',$Pdestid,$Pdestid,$delta,$Pskillid,$Pskillid);
+    $output = $output."inserted content_field_node_skill = $Pdestid,$Pdestid,$delta,$Pskillid <br />";
+
+    $state_two = db_query('INSERT INTO term_node (`nid`,`vid`,`tid`) VALUES (%d,%d,%d)',$Pdestid,$Pdestid,$Pskillid);
+    $output = $output."Inserted term_node = $Pdestid,$Pdestid,$Pskillid <br />";
+
+    return $output;
+}
+
+function _insert_technology($Pdestid, $Ptechnologyid,$delta) {
+
+    $output = '';
+
+    $stage_one = db_query('INSERT INTO content_field_node_technology (`vid`,`nid`,`delta`,`field_node_technology_value`) VALUES (%d,%d,%d,%d) ON DUPLICATE KEY UPDATE field_node_technology_value = %d',$Pdestid,$Pdestid,$delta,$Ptechnologyid,$Ptechnologyid);
+    $output = $output."inserted content_field_node_technology = $Pdestid,$Pdestid,$delta,$Ptechnologyid <br />";
+
+    $state_two = db_query('INSERT INTO term_node (`nid`,`vid`,`tid`) VALUES (%d,%d,%d)',$Pdestid,$Pdestid,$Ptechnologyid);
+    $output = $output."Inserted term_node = $Pdestid,$Pdestid,$Ptechnologyid <br />";
+
+    return $output;
+}
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+
+function robertfoley_migrate_menu_alter(&$items) {
+  
+  // hide advanced help tab in search results
+  //$items['search/advanced_help']['access callback'] = false;
+  
+  // hide users search tab in search results.
+  //$items['search/user']['access callback'] = false;
+
+    /**
+     * SELECT rel_project_industry.IndustryID, migrate_map_industry.destid FROM rel_project_industry left join migrate_map_industry on migrate_map_industry.sourceid = rel_project_industry.IndustryID
+     */
+
+}
+
+/**
+ * Implementation of the css hook to add icons to the admin module.
+ */
+
+/*
+function robertfoley_migrate_init() {
+    if (arg(0) == 'admin'){
+        drupal_add_css(drupal_get_path('module','robertfoley_migrate').'/css/robertfoley_migrate.css','module','screen');
+        drupal_add_css(drupal_get_path('module', 'robertfoley_migrate').'/css/robertfoley_migrate_admin.css', 'module', 'screen');
+    }
+
+}
+*/
+
+
+function robertfoley_migrate_form_alter(&$form, $form_state, $form_id) {
+  /*
+  // little debug field to list form ids.
+  $form['tempname'] = array(
+    '#title' => t('form name'),
+    '#type' => 'textfield',
+    '#value' => $form_id,
+    '#weight' => '-15',
+   );
+  */
+  
+  switch ($form_id) {
+    case 'search_theme_form':
+        
+        /*
+        $form['form_array'] = array(
+          '#title' => t('form array'),
+          '#type' => 'textarea',
+          '#value' => print_r($form, true),
+        );
+        */
+        
+        /*
+        $form['submit']['#type'] = 'image_button';
+        $form['submit']['#src'] = drupal_get_path('theme', 'ensequence') . '/images/search_btn.png';
+        $form['submit']['#attributes'] = array('title' => t('Search'));
+        */
+        
+      break;
+  };
+  
+  
+}
+
+
+/*
+function robertfoley_migrate_preprocess_page(&$vars) {
+  if (arg(0) == 'admin'){
+    $vars['head'] = '<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />'.$vars['head'];
+  }
+}
+*/

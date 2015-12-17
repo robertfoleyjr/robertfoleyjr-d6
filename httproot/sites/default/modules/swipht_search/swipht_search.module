@@ -1,0 +1,104 @@
+<?php
+// $Id$
+/**
+ * @file swipht_search.module
+ * Custom module that modifies different aspects of the Drupal
+ * system to extend the gui elements of the site.
+ * 
+ */
+
+/**
+  *  Valid permissions for this module
+  *  @return array An array of valid permissions for the module
+  */
+
+/*
+function swipht_search_perm() {
+  return array();
+}
+*/
+
+/**
+ * Implementation of hook_menu().
+ */
+/*
+function swipht_search_menu() {
+
+  $items = array();
+  
+  return $items;
+}
+*/
+
+
+/**
+ * Implementation of hook_menu_alter().
+ */
+
+function swipht_search_menu_alter(&$items) {
+  
+  // hide advanced help tab in search results
+  $items['search/advanced_help']['access callback'] = false;
+  
+  // hide users search tab in search results.
+  $items['search/user']['access callback'] = false;
+  
+}
+
+/**
+ * Implementation of the css hook to add icons to the admin module.
+ */
+
+/*
+function swipht_search_init() {
+    if (arg(0) == 'admin'){
+        drupal_add_css(drupal_get_path('module','swipht_search').'/css/swipht_search.css','module','screen');
+        drupal_add_css(drupal_get_path('module', 'swipht_search').'/css/swipht_search_admin.css', 'module', 'screen');
+    }
+
+}
+*/
+
+
+function swipht_search_form_alter(&$form, $form_state, $form_id) {
+  /*
+  // little debug field to list form ids.
+  $form['tempname'] = array(
+    '#title' => t('form name'),
+    '#type' => 'textfield',
+    '#value' => $form_id,
+    '#weight' => '-15',
+   );
+  */
+  
+  switch ($form_id) {
+    case 'search_theme_form':
+        
+        /*
+        $form['form_array'] = array(
+          '#title' => t('form array'),
+          '#type' => 'textarea',
+          '#value' => print_r($form, true),
+        );
+        */
+        
+        /*
+        $form['submit']['#type'] = 'image_button';
+        $form['submit']['#src'] = drupal_get_path('theme', 'ensequence') . '/images/search_btn.png';
+        $form['submit']['#attributes'] = array('title' => t('Search'));
+        */
+        
+      break;
+  };
+  
+  
+}
+
+
+/*
+function swipht_search_preprocess_page(&$vars) {
+  if (arg(0) == 'admin'){
+    $vars['head'] = '<meta http-equiv="X-UA-Compatible" content="IE=EmulateIE7" />'.$vars['head'];
+  }
+}
+*/

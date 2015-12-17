@@ -1,0 +1,23 @@
+<?php
+// $Id$
+
+/** 
+  * @file swipht_gui.install
+  * This file provides the install and uninstall for the module.
+ **/
+
+function swipht_gui_install() {
+  
+}
+
+function swipht_gui_uninstall() {
+
+}
+
+function swipht_gui_enable() {
+
+}
+
+function swipht_gui_disable() {
+
+}

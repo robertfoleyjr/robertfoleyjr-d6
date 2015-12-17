@@ -1,0 +1,66 @@
+<?php
+
+/**
+ * Implementation of hook_token_list().
+ */
+function token_vocab_token_list($type = 'all'){
+  $tokens = array();
+  if (($type == 'node' || $type == 'all') && module_exists('taxonomy')) {
+    $tokens['node']['jens-test'] = t("Jen's Test Token");
+    $vocabs = taxonomy_get_vocabularies(NULL);
+    foreach ($vocabs as $vid => $vocab){
+      $name = _token_vocab_clean_name($vocab->name);
+      $tokens['node']['vocab-'.$name.'-term'] = 
+        t("Top term name in vocabulary: ".$name);
+      $tokens['node']['vocab-'.$name.'-term-raw'] = 
+        t("Unfiltered name of top term in vocabulary: ".$name.". WARNING - raw user input.");
+      $tokens['node']['vocab-'.$name.'-term-id'] = 
+        t("ID of top term in vocabulary: ".$name);
+    } // foreach
+  } // if type node or all and taxonomy installed
+  return $tokens;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function token_vocab_token_values($type, $object = NULL){
+  $values = array();
+  $node = $object;
+  if (($type == 'node' || $type == 'all') 
+    && module_exists('taxonomy') && !empty($node->taxonomy) && is_array($node->taxonomy)) {
+      
+      $values['jens-test'] = 'test';
+    
+    // iterate over vocabs
+    $vocabs = taxonomy_get_vocabularies(NULL);
+    foreach ($vocabs as $vid => $vocab){
+      $name = _token_vocab_clean_name($vocab->name);
+      
+      // pull top term for this vocab
+      $query = db_query("SELECT td.tid, td.name FROM {term_data} td INNER JOIN {term_node} tn ON tn.tid = td.tid WHERE td.vid = %d AND tn.nid = %d ORDER BY weight LIMIT 1", $vid, $node->nid);
+      
+      if ($result = db_fetch_array($query)){
+        // set token values
+        $values['vocab-'.$name.'-term'] = check_plain(_token_vocab_clean_name($result['name']));
+        $values['vocab-'.$name.'-term-raw'] = _token_vocab_clean_name($result['name']);
+        $values['vocab-'.$name.'-term-id'] = $result['tid'];
+      }
+      else {
+        // set default empty strings for all vocabs
+        $values['vocab-'.$name.'-term'] = '';
+        $values['vocab-'.$name.'-term-raw'] = '';
+        $values['vocab-'.$name.'-term-id'] = '';
+      }
+      
+    } // foreach    
+  
+  } // if node has vocab
+  return $values;
+}
+
+function _token_vocab_clean_name($name){
+  $hyphen = str_replace(' ', '-', $name);
+  $clean = strtolower($hyphen);
+  return $clean;
+}

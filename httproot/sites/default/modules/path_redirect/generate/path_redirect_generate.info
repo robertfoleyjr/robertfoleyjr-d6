@@ -1,0 +1,14 @@
+name = Path redirect generate
+description = Bulk create redirects for testing.
+package = Development
+core = 6.x
+dependencies[] = path_redirect
+dependencies[] = devel_generate
+tags[] = developer
+
+; Information added by drupal.org packaging script on 2011-05-20
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "path_redirect"
+datestamp = "1305851641"
+

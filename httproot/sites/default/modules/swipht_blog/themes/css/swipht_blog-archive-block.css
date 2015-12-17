@@ -1,0 +1,82 @@
+/* 
+    Document   : swipht_blog-archive-block.css
+    Created on : Jun 6, 2010, 12:09:00 PM
+    Author     : robert
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+.blog-archive-block ul {
+margin:0;
+padding:0;
+}
+
+.blog-archive-block ul li {
+list-style:none outside none;
+margin:5px 0;
+padding:0;
+}
+
+.blog-archive-block ul li.expanded div.control {
+background:url("../images/accordion-arrow-down.png") no-repeat scroll 0 0 transparent;
+cursor:pointer;
+float:left;
+height:9px;
+margin:3px 7px 0 0;
+width:12px;
+}
+
+.blog-archive-block ul li.collapsed div.control {
+background:url("../images/accordion-arrow-right.png") no-repeat scroll 0 0 transparent;
+cursor:pointer;
+float:left;
+height:12px;
+margin:3px 7px 0 0;
+width:9px;
+}
+
+.blog-archive-block ul li a {
+color:#3c3c3c;
+display: inline !important;
+}
+
+.blog-archive-block ul li a:first-child {
+    margin-left: 0px !important;
+}
+
+.blog-archive-block ul li.expanded ul {
+display:block;
+}
+
+.blog-archive-block ul li.expanded ul {
+margin-left:25px;
+}
+
+.blog-archive-block ul {
+margin:0;
+padding:0;
+}
+
+.blog-archive-block ul li ul li {
+padding:0;
+}
+
+.blog-archive-block ul li {
+list-style:none outside none;
+margin:5px 0;
+padding:0;
+}
+
+.blog-archive-block ul li.collapsed ul {
+display:none;
+}
+
+.blog-archive-block ul {
+margin:0;
+padding:0;
+}

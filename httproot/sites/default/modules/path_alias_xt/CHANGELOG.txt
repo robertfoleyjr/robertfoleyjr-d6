@@ -1,0 +1,29 @@
+$Id: CHANGELOG.txt,v 1.6 2010/05/02 00:57:46 rdeboer Exp $
+
+Changelog for Extended Path Aliases module for drupal 6.
+
+6.x-1.0-alpha1
+==============
+Initial release
+
+6.x-1.0-alpha2
+==============
+Remove reliance on custom_url_rewrite_outbound(), so that the module will work
+with Domain Access.
+
+6.x-1.0-alpha3
+==============
+Added line to admin/reports/status showing whether PECL runkit library is installed.
+
+6.x-1.0-alpha4
+==============
+Updated code comments and README.txt
+
+6.x-1.0-beta1
+=============
+More comments to code and README.txt
+Feature request [#766876]
+
+6.x-1.0-beta2
+=============
+Updated README [#787418] (thanks: Ken Hawkins)

@@ -1,0 +1,51 @@
+
+/* management screen overrides */
+
+/**/
+form div.column-side div.buttons {
+  position: fixed !important;
+  width: 250px !important;
+}
+
+
+form .content-multiple-drag {
+  width: 20px !important;
+}
+
+form input.fluid {
+  -moz-box-sizing:border-box;
+  width:83%;
+}
+
+form .noderelationships-nodereference-buttons-wrapper {
+  /* float: right; */
+}
+
+
+
+
+/** ckeditor css style override */
+
+.cke_editor, .cke_dialog_contents, .cke_dialog_page_contents, .cke_dialog_page_contents table, .cke_dialog_footer_buttons {
+  -moz-box-shadow: none !important;
+}
+
+.cke_browser_ie8 table.cke_editor {
+  display: inherit !important;
+}
+
+/** ccs override for editor in multiple drag cell **/
+tr.draggable td {
+  background: none !important;
+}
+
+/** fixes for the multiselect module **/
+
+  div.form-item.multiselect:hover { background-color:#f0f8f4; }
+
+  .page-content div.form-item.multiselect div.form-item:hover,
+  .page-content div.form-item.multiselect .fieldset div.form-item:hover { background-color: transparent !important; }
+
+  .page-content div.form-item.multiselect div.form-item:hover { z-index: auto !important; }
+
+  .page-content div.form-item.multiselect div.form-item.form-item-labeled { margin-left:310px; width:500px; }

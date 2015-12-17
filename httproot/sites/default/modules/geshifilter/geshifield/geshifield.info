@@ -1,0 +1,13 @@
+name = "GeSHi field"
+description = "Provides a CCK field for source code with GeSHI syntax highlighting."
+package = "Filters"
+core = 6.x
+dependencies[] = content
+dependencies[] = geshifilter
+
+; Information added by drupal.org packaging script on 2013-01-29
+version = "6.x-1.4+4-dev"
+core = "6.x"
+project = "geshifilter"
+datestamp = "1359421709"
+

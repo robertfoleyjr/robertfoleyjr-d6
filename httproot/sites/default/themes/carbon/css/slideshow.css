@@ -1,0 +1,221 @@
+/* slideshow */
+
+#slideshow-wrapper {
+    clear:both;
+    height:443px;
+    width:1023px;
+}
+
+#header-logo {
+    left:10px;
+    padding-left:10px;
+    padding-top: 0px;
+    position:absolute;
+    top:95px;
+}
+
+#slideshow-footer {
+    position:absolute;
+    top:494px;
+}
+
+
+.slideshow {
+  height: 434px;
+  width: 100%;
+  border-right: solid 1px black;
+
+}
+.slideshow-bg-01 {
+  background-image: url(../images/teaser-bg-01.jpg);
+  background-repeat: no-repeat;
+}
+.slideshow-bg-02 {
+  background-image: url(../images/teaser-bg-02.jpg);
+  background-repeat: no-repeat;
+}
+.slideshow-bg-03 {
+  background-image: url(../images/teaser-bg-03.jpg);
+  background-repeat: no-repeat;
+}
+
+.slideshow-no-background {
+  height: auto;
+  background: none;
+  border: 1px solid #074662;
+  border-bottom: 7px solid #074662;
+}
+#sub-header .slideshow .slideshow-inner {
+  width: 925px;
+}
+.slideshow .slideshow-inner {
+  position: relative;
+  height:424px;
+  /* width: 925px; */
+  max-width: 1024px;
+  /* margin: 0 auto; */
+  overflow: hidden;
+}
+.slideshow div.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 424px;
+  /* width: 925px; */
+  display: none;
+}
+.slideshow div.active {
+  display: block;
+}
+.slideshow #slideshow-controls {
+  position: absolute;
+  left: 20px;
+  bottom: 10px;
+  height: 29px;
+  /* padding: 0 10px; */
+}
+
+.slideshow #slideshow-control-list {
+  float: left;
+}
+ul#slideshow-control-number-list {
+  margin: 0;
+  padding: 0;
+}
+ul#slideshow-control-number-list li.number {
+  list-style: none;
+  float: left;
+  width: 22px;
+  height: 29px;
+  margin: 0px !important;
+  padding: 0;
+  background: url(../images/teaser-nav-inactive.png) center no-repeat;
+  cursor: pointer;
+}
+
+ul#slideshow-control-number-list li.active, ul#slideshow-control-number-list li.number:hover {
+  background: url(../images/teaser-nav-active.png) center no-repeat;
+}
+#slideshow-previous {
+  float: left;
+  height: 29px;
+  width: 13px;
+  margin: 0px !important;
+  padding: 0px !important;
+  background: url(../images/teaser-nav-bg-left.png) center no-repeat;
+  cursor: pointer;
+}
+#slideshow-next {
+  float: left;
+  height: 29px;
+  width: 13px;
+  margin: 0px !important;
+  padding: 0px !important;
+  background: url(../images/teaser-nav-bg-right.png) center no-repeat;
+  cursor: pointer;
+}
+
+
+/** slide styles **/
+
+.teaser-item-main-wrapper {
+    position:absolute;
+    left:91px;
+    top:100px;
+    width:840px;
+}
+
+.teaser-item-column-one-wrapper {
+    float:left;
+    width:370px;
+    margin-top:20px;
+}
+
+.teaser-item-title {
+    height:40px;
+    overflow:hidden;
+}
+
+.teaser-item-title a {
+    color:#990000;
+}
+
+.teaser-item-title a:hover {
+    text-decoration: underline;
+}
+
+div.teaser-item-title h2 {
+    color:#990000;
+    font-family:Colaborate, Verdana, Geneva, sans-serif;
+    font-size:200%;
+    letter-spacing:1px;
+    text-shadow: #000000 0px 1px 3px;
+}
+
+div.teaser-time-title a:hover, div.teaser-time-title a h2:hover {
+    color: #d10000;
+}
+
+.teaser-item-subtitle {
+
+}
+
+.teaser-item-subtitle a {
+  color:#ffffff;
+}
+
+.teaser-item-subtitle a:hover {
+    text-decoration: underline;
+}
+
+.teaser-item-subtitle h3 {
+    color:#ffffff;
+    font-family:Colaborate, Verdana, Geneva, sans-serif;
+    letter-spacing:1px;
+    text-shadow: #000000 0px 1px 3px;
+}
+
+.teaser-item-desc {
+    color:#FFFFFF;
+    font-size:12px;
+    left:20px;
+    position:absolute;
+    top:90px;
+    width:380px;
+    letter-spacing:0.25px;
+    line-height:16px;
+}
+
+.teaser-item-more {
+    color:#FFFFFF;
+    left:400px;
+    position:absolute;
+    top:240px;
+}
+
+.teaser-item-more a {
+    color:#ffffff;
+    font-family:Colaborate, Verdana, Geneva, sans-serif;
+    letter-spacing:1px;
+    text-shadow: #000000 0px 1px 3px;
+}
+
+.teaser-item-column-two-wrapper {
+    float:right;
+}
+
+.teaser-item-image {
+    background-color:#FFFFFF;
+    height:250px;
+    width:390px;
+    border: 1px solid lightgrey;
+    -moz-box-shadow: 1px 1px 5px #fff; /* Firefox */
+    -webkit-box-shadow: 1px 1px 5px #fff; /* Safari, Chrome */
+    box-shadow: 1px 1px 5px #fff; /* CSS3 */
+}
+
+/*
+#content-wrapper {
+    margin: 0px !important;
+}
+*/

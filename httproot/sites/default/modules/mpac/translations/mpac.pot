@@ -1,0 +1,58 @@
+# $Id$
+#
+# LANGUAGE translation of Drupal (general)
+# Copyright YEAR NAME <EMAIL@ADDRESS>
+# Generated from files:
+#  mpac.admin.inc: n/a
+#  mpac.module,v 1.2 2009/11/05 16:46:19 stborchert
+#  mpac.info,v 1.1 2009/11/04 19:09:43 stborchert
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"POT-Creation-Date: 2010-07-23 18:53+0200\n"
+"PO-Revision-Date: YYYY-mm-DD HH:MM+ZZZZ\n"
+"Last-Translator: NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+
+#: mpac.admin.inc:14
+msgid "Maximum number of items"
+msgstr ""
+
+#: mpac.admin.inc:15
+msgid "Select the maximum number of items in an autocomplete popup provided by mpac."
+msgstr ""
+
+#: mpac.module:64;84
+msgid "*"
+msgstr ""
+
+#: mpac.module:82
+msgid "You may enter the title of the node you'd like to link to to get a list of all possible matches."
+msgstr ""
+
+#: mpac.module:84
+msgid "Matches marked with %marker are URL aliases."
+msgstr ""
+
+#: mpac.module:18;27 mpac.info:0
+msgid "Menu path autocomplete"
+msgstr ""
+
+#: mpac.module:19
+msgid "Autocomplete callback for menu path autocomplete"
+msgstr ""
+
+#: mpac.module:28
+msgid "Administer settings for Menu Path Autocomplete"
+msgstr ""
+
+#: mpac.info:0
+msgid "Find paths on menu item creation via autocomplete."
+msgstr ""
+

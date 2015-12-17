@@ -1,0 +1,23 @@
+<?php
+// $Id$
+
+/** 
+  * @file swipht_search.install
+  * This file provides the install and uninstall for the module.
+ **/
+
+function swipht_search_install() {
+  
+}
+
+function swipht_search_uninstall() {
+
+}
+
+function swipht_search_enable() {
+
+}
+
+function swipht_search_disable() {
+
+}

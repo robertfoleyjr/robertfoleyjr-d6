@@ -1,0 +1,13 @@
+; $Id: feedapi_tagger.info,v 1.1 2009/09/22 22:54:48 alexb Exp $
+name = FeedAPI Tagger
+description = "Tags a feed item with a term from a vocabulary. Implemented as secondary parser."
+dependencies[] = feedapi
+dependencies[] = taxonomy
+package = Managing News
+core = 6.x
+; Information added by drupal.org packaging script on 2009-09-22
+version = "6.x-1.0-beta1"
+core = "6.x"
+project = "feedapi_tagger"
+datestamp = "1253660723"
+

@@ -1,0 +1,9 @@
+; $Id: 
+name = Swipht GUI
+description = Swipht Technologies GUI customization module stub. This module is customized per project or feature.
+package = Client Custom
+core = 6.x
+
+
+version = "6.x-1.0"
+core = "6.x"

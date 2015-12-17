@@ -1,0 +1,7 @@
+; $Id
+name = Token for Vocabularies
+description = Token for Vocabularies provides specific token replacements for the top term in each vocab
+dependencies[] = taxonomy
+dependencies[] = token
+package = SYPartners
+core = 6.x

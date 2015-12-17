@@ -1,0 +1,346 @@
+<?php
+// $Id: permissions_lock.module,v 1.6 2010/07/08 11:01:37 xeniox Exp $
+
+/**
+ * @file
+ * Lock permissions on the permissions administration pages for certain roles
+ *
+ * @author Sven Decabooter
+ */
+
+/**
+ * Implementation of hook_locale().
+ * This groups translatable strings for easier import/export
+ */
+function permissions_lock_locale($op = 'groups') {
+  switch ($op) {
+    case 'groups':
+      return array('permissions_lock' => t('Permissions Lock'));
+  }
+}
+
+/**
+ * Implementation of hook_help().
+ * Display help and module information
+ * @param path - A Drupal menu router path the help is being requested for
+ * @param arg - An array that corresponds to the return of the arg() function
+ * @return A localized string containing the help text.
+ */
+function permissions_lock_help($path, $arg) {
+  $output = '';
+  switch ($path) {
+    case 'admin/settings/help#description':
+      $output = t('Lock permissions on the permissions administration pages for certain roles');
+      break;
+    case "admin/help#permissions_lock":
+      $output = '<p>'. t('Lock permissions on the permissions administration pages for certain roles') .'</p>';
+      break;
+  }
+  return $output;
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function permissions_lock_menu() {
+  $items['admin/user/permissions/list'] = array(
+    'title' => 'Permissions',
+    'access arguments' => array('manage permission locks'),
+    'weight' => -10,
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'file' => 'user.admin.inc',
+    'file path' => drupal_get_path('module', 'user'),
+  );
+  $items['admin/user/permissions/lock'] = array(
+    'title' => 'Lock permissions',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('permissions_lock_settings_form'),
+    'access arguments' => array('manage permission locks'),
+    'type' => MENU_LOCAL_TASK
+  );
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function permissions_lock_perm() {
+  return array('manage permission locks', 'manage permissions unrestricted');
+}
+
+/**
+ * Implementation of hook_form_alter().
+ */
+function permissions_lock_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_admin_perm' || $form_id == 'user_permissions_profile_permissions_form') {
+    // Get all available permissions in the form
+    $available_permissions = _permissions_lock_get_form_available_permissions($form);
+
+    if (!user_access('manage permissions unrestricted')) {
+      // add our custom validate handler, to restore unset permissions back to their current settings
+      $form["#validate"][] = 'permissions_lock_form_validate';
+
+      // get locked roles & permissions, to remove them from the form
+      $locked_roles = permissions_lock_get_locked_roles();
+      $locked_permissions = permissions_lock_get_locked_permissions();
+      // for roles that are locked, we remove their complete column. The permissions for this role will remain untouched.
+      if (!empty($locked_roles)) {
+        foreach ($locked_roles as $locked_rid) {
+          unset($form['checkboxes'][$locked_rid]);
+          unset($form['role_names'][$locked_rid]);
+        }
+
+        /* if we are on a role-specific page, we redirect user to general permissions page,
+           as there is nothing to change on the specific page anyway */
+        $editing_rid = arg(3);
+        if (is_numeric($editing_rid) && $editing_rid > 0 && in_array($editing_rid, $locked_roles)) {
+          drupal_goto('admin/user/permissions');
+        }
+      }
+
+      // get the roles that still remain (unlocked)
+      $available_roles = $form['role_names'];
+
+      // now remove the permission rows for all locked permissions
+      if (!empty($available_roles) && !empty($available_permissions)) { // make sure there is something left to unset
+        foreach ($available_permissions as $perm) {
+          foreach ($available_roles as $rid => $role) {
+            // check if this permission is marked locked. If so, remove the row
+            if (in_array($perm, $locked_permissions)) {
+              unset($form['permission'][$perm]);
+              unset($form['checkboxes'][$rid]['#options'][$perm]);
+            }
+          }
+        }
+        _permissions_lock_cleanup_orphan_headers($form);
+      }
+    }
+  }
+}
+
+/**
+ * Custom validation handler to keep the locked permissions in their current state.
+ */
+function permissions_lock_form_validate($form, &$form_state) {
+  // get a list of roles that were available in the form
+  foreach (array_keys($form_state['values']) as $value) {
+    if (is_numeric($value)) {
+      $available_roles[$value] = $value;
+    }
+  }
+  // get the current state of permissions for the available roles
+  $role_current = permissions_lock_get_current_permissions($available_roles);
+
+  if (!empty($role_current)) {
+    foreach ($role_current as $rid => $perm) {
+      $perm_array = array();
+      // convert $perm string into an array
+      $perm_array = split(', ', $perm);
+      if (!empty($perm_array)) {
+        // loop through the current permissions for this role, and check if this permission was locked
+        // if so, we need to add the value to the form return values, otherwise these settings will be removed instead
+        foreach ($perm_array as $set_permission) {
+          if (in_array($set_permission, permissions_lock_get_locked_permissions())) {
+            // this permission was set for this role, however we removed it from the form.
+            // we have to add it back to the form values, in order to keep the permission as it was before.
+            $form_state['values'][$rid][$set_permission] = $set_permission;
+          }
+        }
+      }
+    }
+  }
+
+}
+
+/**
+ * Get the current state of permissions (before the form is submitted & permissions are changed)
+ *
+ * @param array $roles
+ * @return array containing permissions per role
+ */
+function permissions_lock_get_current_permissions($roles) {
+  if (!empty($roles) && is_array($roles)) {
+    $result = db_query("SELECT rid, perm FROM {permission} WHERE rid IN (". db_placeholders($roles) .")", $roles);
+    while ($perm = db_fetch_object($result)) {
+      $defaults[$perm->rid] = $perm->perm;
+    }
+  }
+  return $defaults;
+}
+
+/**
+ * Helper function to retrieve the permissions that are available in the permissions form
+ */
+function _permissions_lock_get_form_available_permissions($form) {
+  if (!empty($form['permission'])) {
+    foreach ($form['permission'] as $permission => $value) {
+      if (!is_numeric($permission)) {
+        $available_permissions[] = $permission;
+      }
+    }
+  }
+  return $available_permissions;
+}
+
+/**
+ * Helper function to remove permission table headers without related permissions
+ */
+function _permissions_lock_cleanup_orphan_headers(&$form) {
+  if (!empty($form['permission'])) {
+    $prev_numeric = FALSE;
+    $num = 0;
+    foreach ($form['permission'] as $permission => $value) {
+      if (is_numeric($permission)) {
+        if ($prev_numeric) {
+          // 2 numeric items following each other. Remove the first one, as it's an orphan header
+          unset($form['permission'][$num]);
+        }
+        $prev_numeric = TRUE;
+        $num = $permission;
+      }
+      else {
+        $prev_numeric = FALSE;
+        // Unset $num, needed for last iteration check
+        unset($num);
+      }
+    }
+    // After last iteration in foreach, check if last row was numeric
+    // If so, rmeove, it is an orphan
+    if ($num) {
+      unset($form['permission'][$num]);
+    }
+  }
+}
+
+/**
+ * Get a list of available permissions on the website
+ */
+function _permissions_lock_get_available_permissions($exclude_hook = TRUE) {
+  // Render role/permission overview:
+  $options = array();
+  foreach (module_list(FALSE, FALSE, TRUE) as $module) {
+    if ($permissions = module_invoke($module, 'perm')) {
+      asort($permissions);
+      foreach ($permissions as $perm) {
+        $available_permissions[$perm] = $perm;
+      }
+    }
+  }
+
+  if ($exclude_hook) {
+    if ($hook_locks = permissions_lock_get_hook_data('permission')) {
+      foreach ($hook_locks as $perm) {
+        unset($available_permissions[$perm]);
+      }
+    }
+  }
+  return $available_permissions;
+}
+
+/**
+ * Get an array of locked permissions
+ *
+ * @return array
+ */
+function permissions_lock_get_locked_permissions() {
+  $locked = variable_get('permissions_lock_locked_perm', array());
+  $hook_locks = permissions_lock_get_hook_data('permission');
+  $locked = array_merge($locked, $hook_locks);
+  return array_filter($locked);
+}
+
+/**
+ * Get an array of locked roles
+ *
+ * @return array
+ */
+function permissions_lock_get_locked_roles() {
+  $locked = variable_get('permissions_lock_locked_roles', array());
+  $locked = array_filter($locked);
+  $hook_locks = permissions_lock_get_hook_data('role');
+  if ($hook_locks) {
+    // alternative method instead of array_merge(), since that doesn't work well with numeric array keys
+    foreach ($hook_locks as $rid) {
+      $locked[$rid] = $rid;
+    }
+  }
+  return $locked;
+}
+
+/**
+ * Get a list of permissions locks that have been set through hook_permissions_lock()
+ */
+function permissions_lock_get_hook_data($type = 'permission') {
+  return drupal_map_assoc(module_invoke_all('permissions_lock', $type));
+}
+
+/**
+ * Settings form to control which permissions and / or roles have to be locked
+ */
+function permissions_lock_settings_form() {
+  $form = array();
+
+  $form['permissions_lock_permissions'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Permissions'),
+    '#weight' => 0,
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+  $form['permissions_lock_permissions']['permissions_lock_locked_perm'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Locked permissions'),
+    '#description' => t("Specify which permissions will not be changeable by users without the 'manage permissions unrestricted' permission"),
+    "#default_value" => permissions_lock_get_locked_permissions(),
+    "#options" => _permissions_lock_get_available_permissions(),
+  );
+
+  $hook_locks = permissions_lock_get_hook_data('permission');
+  if ($hook_locks) {
+    $form['permissions_lock_permissions']['permissions_lock_hook_locks'] = array(
+      '#type' => 'item',
+      '#title' => t('Locked permissions through modules'),
+      '#value' => theme('item_list', $hook_locks),
+      '#description' => t('A list of permissions that are locked through modules implementing hook_permissions_lock()'),
+    );
+  }
+
+  $form['permissions_lock_roles'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Roles'),
+    '#weight' => 0,
+    '#collapsible' => TRUE,
+    '#collapsed' => FALSE,
+  );
+
+  $hook_lock_roles = permissions_lock_get_hook_data('role');
+  $form['permissions_lock_roles']['permissions_lock_locked_roles'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Locked roles'),
+    '#description' => t("Users without the 'manage permissions unrestricted' permission will not be able to change permissions for the selected roles."),
+    "#default_value" => permissions_lock_get_locked_roles(),
+    "#options" => array_diff_key(user_roles(), $hook_lock_roles),
+  );
+
+  if ($hook_lock_roles) {
+    $form['permissions_lock_roles']['permissions_lock_hook_lock_roles'] = array(
+      '#type' => 'item',
+      '#title' => t('Locked roles through modules'),
+      '#value' => theme('item_list', _permissions_lock_hook_roles($hook_lock_roles)),
+      '#description' => t('A list of roles that are locked through modules implementing hook_permissions_lock()'),
+    );
+  }
+  return system_settings_form($form);
+}
+
+/**
+ * Helper function to generate a list for display purposes of all roles locked through a hook
+ */
+function _permissions_lock_hook_roles($hook_lock_roles) {
+  $all_roles = user_roles();
+  $ret = array();
+  foreach ($hook_lock_roles as $rid) {
+    $ret[$rid] = $all_roles[$rid];
+  }
+  return $ret;
+}

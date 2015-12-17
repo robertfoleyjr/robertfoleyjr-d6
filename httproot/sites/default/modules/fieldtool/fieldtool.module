@@ -1,0 +1,594 @@
+<?php
+/**
+ * @file
+ * Field Tool -
+ * An API for programmatically accessing fields of objects in a generic way.
+ *
+ * Copyright 2009 by Jakob Petsovits ("jpetso", http://drupal.org/user/56020)
+ */
+
+module_load_include('inc', 'fieldtool', 'generic_callbacks');
+
+/**
+ * Common field callback (getter and/or import) that extracts a value from the
+ * object, exactly like it exists in the object itself. Field info hooks can
+ * use this callback to avoid code duplication.
+ */
+function fieldtool_field_verbatim_get($object, $field_name, $field_info) {
+  if (is_array($object)) {
+    return isset($object[$field_name]) ? $object[$field_name] : NULL;
+  }
+  return isset($object->$field_name) ? $object->$field_name : NULL;
+}
+
+/**
+ * Common field callback (setter and/or export) that sets a value to the given
+ * object. Field info hooks can use this callback to avoid code duplication.
+ */
+function fieldtool_field_verbatim_set(&$object, $field_name, $value, $field_info) {
+  if (is_array($object)) {
+    if (isset($value)) {
+      $object[$field_name] = $value;
+    }
+    else {
+      unset($object[$field_name]);
+    }
+  }
+  else {
+    if (isset($value)) {
+      $object->$field_name = $value;
+    }
+    else {
+      unset($object->$field_name);
+    }
+  }
+}
+
+
+
+/**
+ * Get a list of entity types that can contain fields. For example, there is an
+ * entity type called 'node' that you can pass to fieldtool_fields() in order
+ * to retrieve node fields.
+ */
+function fieldtool_entity_types() {
+  static $entity_types;
+
+  if (!isset($entity_types)) {
+    $cache = cache_get('fieldtool:entity-types');
+
+    if (!empty($cache->data)) {
+      $entity_types = $cache->data;
+    }
+    else {
+      $entity_types = module_invoke_all('fieldtool_entity_types');
+      drupal_alter('fieldtool_entity_types', $entity_types);
+      cache_set('fieldtool:entity-types', $entity_types);
+    }
+  }
+  return $entity_types;
+}
+
+/**
+ * Implementation of hook_fieldtool_entity_types().
+ */
+function fieldtool_fieldtool_entity_types() {
+  return array(
+    'node' => array('label' => t('Node')),
+    'user' => array('label' => t('Drupal user')),
+  );
+}
+
+/**
+  * Get a list of field information arrays of the given entity type.
+  *
+  * @param $entity_type
+  *   The thing that you want to retrieve field information about, e.g. 'node'
+  *   for node types.
+  * @param $filters
+  *   A structured array with filters on the full result set. The following
+  *   filters are supported:
+  *
+  *   - 'types': An array of entity type identifiers (strings), e.g.
+  *        @code array('page', 'story') @endcode for 'node' entities.
+  *        If the field is present in any of the types, it will be returned.
+  *        Empty means any type is allowed.
+  *   - 'required keys':
+  *        An array of required keys in each returned field description.
+  *        Only fields that have all of those keys set will be returned.
+  *
+  * @return
+  *   An array of field information keyed by the field name. Each piece of
+  *   information is again a structured array, with appropriate values expected
+  *   for 'label' (user-visible name), and any number of callbacks or other
+  *   plugin-provided information.
+  */
+function fieldtool_fields($entity_type, $filters = array()) {
+  static $fields;
+
+  if (!isset($fields)) {
+    $cache = cache_get('fieldtool:fields');
+
+    _fieldtool_ctools_include_plugins();
+    $plugins = ctools_get_plugins('fieldtool', 'fields');
+
+    if (!empty($cache->data)) {
+      $fields = $cache->data;
+    }
+    else {
+      $fields = array();
+
+      foreach ($plugins as $plugin) {
+        foreach (fieldtool_entity_types() as $e_type => $entity_type_info) {
+          if (empty($plugin[$e_type])) {
+            continue;
+          }
+          foreach ($plugin[$e_type] as $field_name => &$field_info) {
+            $field_info['module'] = $plugin['module'];
+            $field_info['file'] = $plugin['file'];
+            $field_info['path'] = $plugin['path'];
+            $field_info['name'] = $field_name;
+
+            if (!isset($field_info['weight'])) {
+              $field_info['weight'] = 0;
+            }
+            $fields[$e_type][$field_name] = $field_info;
+          }
+        }
+      }
+      drupal_alter('fieldtool_fields', $fields);
+
+      foreach ($fields as $e_type => &$e_type_fields) {
+        $fields_by_weight = array();
+
+        foreach ($e_type_fields as $field_name => $field_info) {
+          $fields_by_weight[$field_info['weight']][$field_name] = $field_info;
+        }
+        $e_type_fields = array();
+        ksort($fields_by_weight, SORT_NUMERIC);
+
+        foreach ($fields_by_weight as $weight => $weight_fields) {
+          foreach ($weight_fields as $field_name => $field_info) {
+            $e_type_fields[$field_name] = $field_info;
+            
+            // Set a default getter/setter path if none has been specified;
+            if (!array_key_exists('field path', $e_type_fields[$field_name])) {
+              $e_type_fields[$field_name]['field path'] = fieldtool_path($e_type, $e_type_fields[$field_name]);
+            }
+            // Assign generic callback to "leaf" fields if a callback isn't defined.
+            if (!count($e_type_fields[$field_name]['fields'])) {
+              _fieldtool_find_callbacks($e_type_fields[$field_name]);
+            }
+            // TODO: Assign generic recursive callbacks to parent fields.
+          }
+        }
+      }
+      cache_set('fieldtool:fields', $fields);
+    }
+  }
+  
+  // Don't waste time filtering if no filters are given at all.
+  $filters_empty = TRUE;
+
+  foreach ($filters as $filter_name => &$filter) {
+    if (!empty($filter)) {
+      $filters_empty = FALSE;
+      break;
+    }
+  }
+  if ($filters_empty) {
+    return $fields[$entity_type];
+  }
+
+  // Filter out undesired fields.
+  $filtered_fields = array();
+  $entity_type_key = $entity_type . ' types';
+
+  foreach ($fields[$entity_type] as $field_name => &$field_info) {
+    $include_field = TRUE;
+
+    // Filter by required keys.
+    if (!empty($filters['required keys'])) {
+      foreach ($filters['required keys'] as $required_key) {
+        if (!isset($field_info[$required_key])) {
+          $include_field = FALSE;
+          break;
+        }
+      }
+    }
+
+    // Filter by types. If any type is found, we accept the field.
+    if ($include_field && !empty($filters['types'])) {
+      $contains_type = FALSE;
+
+      foreach ($filters['types'] as $required_type) {
+        if (isset($field_info[$entity_type_key])
+            && in_array($required_type, $field_info[$entity_type_key])) {
+          $contains_type = TRUE;
+          break;
+        }
+      }
+      $include_field = $contains_type;
+    }
+
+    if ($include_field) {
+      $filtered_fields[$field_name] = $field_info;
+    }
+  }
+
+  return $filtered_fields;
+}
+
+/**
+ * Retrieve the actual function name of a callback, and load its include file
+ * if necessary. If the function does not exist, an empty value is returned.
+ *
+ * @param $field_info
+ *   One of the field information arrays that was returned by fieldtool_info().
+ * @param $function_name
+ *   The identifier of the function. For example, 'export callback'.
+ */
+function fieldtool_get_function($field_info, $function_name) {
+  _fieldtool_ctools_include_plugins();
+  return ctools_plugin_get_function($field_info, $function_name);
+}
+
+/**
+ * Extract the value of a field for further programmatic processing.
+ * An exception is thrown if there is no getter callback for the given field.
+ *
+ * @param $field_info
+ *   One of the field information arrays returned by fieldtool_fields().
+ * @param $object
+ *   A fully loaded object to extract the field value from.
+ */
+function fieldtool_get($field_info, $object, $deltas = array()) {
+  $deltas = is_array($deltas) ? $deltas : array($deltas);
+  $function = fieldtool_get_function($field_info, 'getter callback');
+  if (empty($function)) {
+    throw new Exception('Getter function could not be found.');
+  }
+  return $function($object, $field_info['name'], $field_info, $deltas);
+}
+
+/**
+ * If there is a setter callback for that field, set its value.
+ *
+ * Callbacks are supposed to accept the same type of data that was returned by
+ * fieldtool_get() (although they might accept other kinds of data as well).
+ * An exception is thrown if there is no setter callback for the given field.
+ *
+ * @param $field_info
+ *   One of the field information arrays returned by fieldtool_fields().
+ * @param $object
+ *   A fully loaded object to write the field value to.
+ * @param $value
+ *   The new value for the field.
+ */
+function fieldtool_set($field_info, &$object, $value, $deltas = array()) {
+  $deltas = is_array($deltas) ? $deltas : array($deltas);
+  $function = fieldtool_get_function($field_info, 'setter callback');
+  if (empty($function)) {
+    throw new Exception('Setter function could not be found.');
+  }
+  $function($object, $field_info['name'], $value, $field_info, $deltas);
+}
+
+/**
+ * Extract the value of a field for exporting to a serialized variable.
+ * An exception is thrown if there is no export callback for the given field.
+ *
+ * @param $field_info
+ *   One of the field information arrays returned by fieldtool_fields().
+ * @param $object
+ *   A fully loaded object to extract the field value from.
+ */
+function fieldtool_export($field_info, $object, $deltas = array()) {
+  $deltas = is_array($deltas) ? $deltas : array($deltas);
+  $function = fieldtool_get_function($field_info, 'export callback');
+  if (empty($function)) {
+    throw new Exception('Export function could not be found.');
+  }
+  return $function($object, $field_info['name'], $field_info, $deltas);
+}
+
+/**
+ * If there is a import callback for that field, set its value.
+ *
+ * Callbacks are supposed to accept the same type of data that was returned by
+ * fieldtool_export() (although they might accept other kinds of data as well).
+ * An exception is thrown if there is no import callback for the given field.
+ *
+ * @param $field_info
+ *   One of the field information arrays returned by fieldtool_fields().
+ * @param $object
+ *   A fully loaded object to write the field value to.
+ * @param $value
+ *   The new (imported) value for the field.
+ * @return 
+ *   Callbacks can optionally return an array with information about the 
+ *   success or failure of the import. eg. (a nodereference field):
+ *   array(
+ *     // Message array keys are the values being imported.
+ *     'error' => array('0' => 'Node ID 0 does not exist.'),
+ *     'warning' => array(
+ *       '12' => 'Node "This is a Node" [nid:12] is unpublished.'
+ *     ),
+ *     'status' => array(
+ *       '12' => 'Node "This is a Node" [nid:12] exists.'
+ *     ),
+ *   );
+ *   Absence of a return value will be taken to imply success.
+ */
+function fieldtool_import($field_info, &$object, $value, $deltas = array()) {
+  $deltas = is_array($deltas) ? $deltas : array($deltas);
+  $function = fieldtool_get_function($field_info, 'import callback');
+  if (empty($function)) {
+    throw new Exception('Import function could not be found.');
+  }
+  return $function($object, $field_info['name'], $value, $field_info, $deltas);
+}
+
+/**
+ * Wrapper for ctools_include(), using our own private copy if ctools isn't
+ * available. We could also redefine ctools_include(), but that might clash
+ * with other modules that do the same, so let's not do that.
+ */
+function _fieldtool_ctools_include_plugins() {
+  if (module_exists('ctools')) {
+    ctools_include('plugins');
+  }
+  elseif (!function_exists('ctools_get_plugins')) {
+    static $used = FALSE;
+    if (empty($used)) {
+      require_once './' . drupal_get_path('module', 'fieldtool') . '/plugins.inc';
+    }
+    $used = TRUE;
+  }
+}
+
+/**
+ * Implementation of hook_ctools_plugin_directory():
+ * Specify the plugin directories for the files containing field and
+ * CCK field type info.
+ */
+function fieldtool_ctools_plugin_directory($module, $plugin) {
+  if ($module == 'fieldtool') {
+    return 'plugins/fieldtool';
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ * Abused in order to make sure the cache is cleared when modules are enabled
+ * or disabled, or when CCK structures change, or whatever brings potential
+ * changes to fields. (That way, the cache is also cleared when visiting
+ * admin/build/modules or when the "Clear caches" button on
+ * admin/settings/performance is pressed.)
+ */
+function fieldtool_field_info() {
+  fieldtool_cache_invalidate();
+}
+
+/**
+ * Clear the extension cache, which causes Field Tool to discover fields
+ * from scratch when a module requests information about them.
+ */
+function fieldtool_cache_invalidate() {
+  cache_clear_all('fieldtool:entity-types', 'cache', '*');
+  cache_clear_all('fieldtool:fields', 'cache', '*');
+}
+
+/**
+  * Get a heirarchical tree of field information arrays of the given entity
+  * type.
+  *
+  * @param $entity_type
+  *   The thing that you want to retrieve field information about, e.g. 'node'
+  *   for node types.
+  * @param $filters
+  *   As per fieldtool_fields(). Can also just be the name of a content type.
+  *
+  * @return
+  *   A tree of field information keyed by the field name.
+  */
+function fieldtool_tree($entity_type, $filters = array()) {
+  //TODO: Maybe we should cache this.
+  static $stored; // At least don't go through this more than once per request.
+  $filter_key = md5(serialize($filters)); // generate unique identifier
+  if (count($stored[$filter_key])) {
+    return $stored[$filter_key];
+  }
+
+  if (is_string($filters)) {
+    $filters = array(
+      'types' => array($filters),
+    );
+  }
+
+  $fields = fieldtool_fields($entity_type, $filters);
+
+  // Find out which fields are children of other fields
+  $children = array();
+  
+  foreach ($fields as $name => $field) {
+    if (count($field['fields'])) {
+      $children = array_merge($children, $field['fields']);
+    }
+  }
+
+  $tree = array();
+  
+  // Add 'root' fields to the tree
+  foreach ($fields as $name => $field) {
+    if (!in_array($name, $children)) {
+      $tree[] = $name;
+    }
+  }
+    
+  _fieldtool_tree_add_children($tree, $fields);
+
+  drupal_alter('fieldtool_tree', $tree);
+
+  $stored[$filter_key] = $tree;
+  
+  return $tree;
+}
+
+/**
+  * Recursively append child fields to a field
+  *
+  * @param $name
+  *   The field name.
+  * @param &$tree
+  *   A partially-constructed field tree.
+  * @param &$children
+  *   An array of field names which we (so far) know to be children of other
+  *   fields.
+  *
+  * @return
+  *   A tree of field information keyed by the field name.
+  */
+function _fieldtool_tree_add_children(&$tree, $fields) {
+  $names = $tree;
+  foreach ($names as $key => $name) {
+    if (count($fields[$name])) { // Taxonomy fields will list all vocabularies, not just for the current type, so we need to filter.
+      $tree[$name] = $fields[$name];
+    }
+    if (count($tree[$name]['fields'])) {
+      _fieldtool_tree_add_children($tree[$name]['fields'], $fields);
+    }
+    unset($tree[$key]);
+  }
+}
+
+/**
+ * Sort fields by weight, taking hierarchy into account.
+ *
+ * @param $entity_type
+ *   The thing that you want to retrieve field information about, e.g. 'node'
+ *   for node types.
+ * @param $filters
+ *   As per fieldtool_fields(). Can also just be the name of a content type.
+ *
+ */
+function fieldtool_flat($entity_type, $filters) {
+  static $stored; // At least don't go through this more than once per request.
+  $filter_key = md5(serialize($filters)); // generate unique identifier
+  if (count($stored[$filter_key])) {
+    return $stored[$filter_key];
+  }
+
+  $tree = fieldtool_tree($entity_type, $filters);
+
+  foreach ($tree as $name => $field) {
+    if (count($field['fields'])) {
+      $flat[$name] = $field;
+      _fieldtool_flat_add_children($flat, $field['fields']);
+      $flat[$name]['fields'] = array_keys($field['fields']);
+    }
+    else {
+      $flat[$name] = $field;
+    }
+  }
+  
+  $stored[$filter_key] = $flat;
+  
+  return $flat;
+} 
+
+/**
+  * Recursively append child fields to a flat list of fields
+  *
+  * @param $name
+  *   The field name.
+  * @param &$flat
+  *   A partially-constructed field tree.
+  * @param &$children
+  *   An array of field names which we (so far) know to be children of other
+  *   fields.
+  *
+  * @return
+  *   A tree of field information keyed by the field name.
+  */
+function _fieldtool_flat_add_children(&$flat, $fields) {
+  foreach ($fields as $name => $field) {
+    if (count($field['fields'])) {
+      $flat[$name] = $field;
+      _fieldtool_flat_add_children($flat, $field['fields']);
+      $flat[$name]['fields'] = array_keys($field['fields']);
+    }
+    else {
+      $flat[$name] = $field;
+    }
+  }
+}
+
+
+/**
+ * Convenience function to find if an array has at least one non-numeric key.
+ */
+function _fieldtool_is_keyed_array($array) {
+  $found = FALSE;
+  foreach (array_keys($array) as $key) {
+    if (!is_numeric($key)) {
+      $found = TRUE;
+    }
+  }
+  return $found;
+}
+
+
+/**
+ * Get the parent field of a field (if any)
+ *
+ * @param $entity_type
+ *   The thing that you want to retrieve field information about, e.g. 'node'
+ *   for node types.
+ * @param $field_info
+ *   One of the field information arrays returned by fieldtool_fields().
+ *
+ * @return
+ *   A tree of field information keyed by the field name.
+ */
+function fieldtool_get_parent($entity_type, $field_info) {
+  $fields = fieldtool_fields($entity_type);
+
+  foreach ($fields as $field) {
+    if (count($field['fields'])) {
+      foreach ($field['fields'] as $child) {
+        if ($child == $field_info['name']) {
+          return $field;
+        }
+      }
+    }
+  }
+  
+  return FALSE;
+}
+
+
+/**
+ * array_merge_recursive() doesn't preserve numeric keys.
+ *
+ * @param $message
+ *   At least one message array. Any additional message arrays provided
+ *   will be merged with it.
+ */
+function fieldtool_message_merge($message) {
+  $messages = array(
+    'error' => array(),
+    'warning' => array(),
+    'status' => array(),
+  );
+  
+  foreach (array_keys($messages) as $type) {
+    foreach (func_get_args() as $message) {
+      foreach ($message[$type] as $key => $value) {
+        $messages[$type][$key] = $value;
+      }
+    }
+  }
+  
+  return $messages;
+}

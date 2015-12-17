@@ -1,0 +1,14 @@
+; $Id: file_aliases.info,v 1.2.4.1 2010/01/07 08:59:05 deciphered Exp $
+name = File Aliases
+description = Adds file aliases to FileFields and Uploads.
+dependencies[] = filefield_paths
+dependencies[] = path
+package = FileField Paths
+core = 6.x
+
+; Information added by drupal.org packaging script on 2010-01-11
+version = "6.x-1.x-dev"
+core = "6.x"
+project = "file_aliases"
+datestamp = "1263211667"
+

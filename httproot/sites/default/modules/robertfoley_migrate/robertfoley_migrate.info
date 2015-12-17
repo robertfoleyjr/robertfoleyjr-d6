@@ -1,0 +1,9 @@
+; $Id: 
+name = Robert Foley Migrate
+description = Stub module for migration.
+package = Client Custom
+core = 6.x
+
+
+version = "6.x-1.0"
+core = "6.x"
