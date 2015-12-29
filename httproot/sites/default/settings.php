@@ -90,7 +90,7 @@
  *   $db_url = 'pgsql://username:password@localhost/databasename';
  */
 $db_url = 'mysql://drupal_robert:r0b3rtf0l3yjrd4p3lp3ssw0rd@localhost/drupal-robertfoleyjr';
-if (php_uname('n') === 'beast-ubuntu'){
+if (php_uname('n') === 'robert-VirtualBox'){
 	$db_url = 'mysql://drupal-robert:r0b3rtf0l3yjrd4p3lp3ssw0rd@localhost/drupal-robertfoleyjr';
 }
 $db_prefix = '';
@@ -168,6 +168,10 @@ ini_set('post_max_size', 300);
  * cross between your various domains.
  */
  $cookie_domain = 'drupal-robertfoleyjr';
+if (php_uname('n') === 'robert-VirtualBox'){
+ $cookie_domain = 'd6.robertfoleyjr.dev';
+}
+
 
 /**
  * Variable overrides:
