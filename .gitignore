@@ -5,3 +5,6 @@ assets/*
 local-settings.php
 */local-settings.php
 *local-settings.php
+localhost.settings.php
+*localhost.settings.php
+*/localhost.settings.php
