@@ -2,3 +2,6 @@ db/*
 assets/*
 /db/*
 /assets/*
+local-settings.php
+*/local-settings.php
+*local-settings.php
