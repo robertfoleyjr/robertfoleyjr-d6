@@ -242,3 +242,7 @@ if (php_uname('n') === 'robert-VirtualBox'){
 #   'forum'      => 'Discussion board',
 #   '@count min' => '@count minutes',
 # );
+
+if (file_exists('./sites/default/localhost.settings.php')) {
+   require('./sites/default/localhost.settings.php');
+}
