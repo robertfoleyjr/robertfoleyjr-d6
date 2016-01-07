@@ -89,10 +89,7 @@
  *   $db_url = 'mysqli://username:password@localhost/databasename';
  *   $db_url = 'pgsql://username:password@localhost/databasename';
  */
-$db_url = 'mysql://drupal_robert:r0b3rtf0l3yjrd4p3lp3ssw0rd@localhost/drupal-robertfoleyjr';
-if (php_uname('n') === 'robert-VirtualBox'){
-	$db_url = 'mysql://drupal-robert:r0b3rtf0l3yjrd4p3lp3ssw0rd@localhost/drupal-robertfoleyjr';
-}
+$db_url = '';
 $db_prefix = '';
 
 /**
