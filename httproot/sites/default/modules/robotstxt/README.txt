@@ -39,7 +39,7 @@ FREQUENTLY ASKED QUESTIONS
 --------------------------
 
 Q: Can this module work if I have clean URLs disabled?
-A: Yes it can! In the .htaccess file of your Drupal's root directory, add the 
+A: Yes it can! In the .htaccess file of your Drupal's root directory, add the
    following two lines to the mod_rewrite section, immediately after the line
    that says "RewriteEngine on":
 

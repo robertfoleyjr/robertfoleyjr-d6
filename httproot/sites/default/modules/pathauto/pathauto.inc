@@ -62,8 +62,6 @@ define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
 /**
  * Matches Unicode characters that are word boundaries.
  *
- * @see http://unicode.org/glossary
- *
  * Characters with the following General_category (gc) property values are used
  * as word boundaries. While this does not fully conform to the Word Boundaries
  * algorithm described in http://unicode.org/reports/tr29, as PCRE does not
@@ -82,6 +80,8 @@ define('PATHAUTO_PUNCTUATION_DO_NOTHING', 2);
  * Note that the PCRE property matcher is not used because we wanted to be
  * compatible with Unicode 5.2.0 regardless of the PCRE version used (and any
  * bugs in PCRE property tables).
+ *
+ * @see http://unicode.org/glossary
  */
 define('PATHAUTO_PREG_CLASS_UNICODE_WORD_BOUNDARY',
   '\x{0}-\x{2F}\x{3A}-\x{40}\x{5B}-\x{60}\x{7B}-\x{A9}\x{AB}-\x{B1}\x{B4}' .
@@ -116,7 +116,7 @@ define('PATHAUTO_PREG_CLASS_UNICODE_WORD_BOUNDARY',
   '\x{A836}-\x{A839}\x{A874}-\x{A877}\x{A8CE}-\x{A8CF}\x{A8F8}-\x{A8FA}' .
   '\x{A92E}-\x{A92F}\x{A95F}\x{A9C1}-\x{A9CD}\x{A9DE}-\x{A9DF}' .
   '\x{AA5C}-\x{AA5F}\x{AA77}-\x{AA79}\x{AADE}-\x{AADF}\x{ABEB}' .
-  '\x{D800}-\x{F8FF}\x{FB29}\x{FD3E}-\x{FD3F}\x{FDFC}-\x{FDFD}' .
+  '\x{E000}-\x{F8FF}\x{FB29}\x{FD3E}-\x{FD3F}\x{FDFC}-\x{FDFD}' .
   '\x{FE10}-\x{FE19}\x{FE30}-\x{FE6B}\x{FEFF}-\x{FF0F}\x{FF1A}-\x{FF20}' .
   '\x{FF3B}-\x{FF40}\x{FF5B}-\x{FF65}\x{FFE0}-\x{FFFD}');
 
@@ -188,6 +188,11 @@ function _pathauto_existing_alias_data($source, $language = '') {
  *
  * @param $string
  *   A string to clean.
+ * @param array $options
+ *   (optional) A keyed array of settings and flags to control the Pathauto
+ *   clean string replacement process. Supported options are:
+ *   - langcode: A language code to be used when translating strings.
+ *
  * @return
  *   The cleaned string.
  */
@@ -250,10 +255,18 @@ function pathauto_cleanstring($string) {
     return '';
   }
 
+  $langcode = NULL;
+  if (!empty($options['language']->language)) {
+    $langcode = $options['language']->language;
+  }
+  elseif (!empty($options['langcode'])) {
+    $langcode = $options['langcode'];
+  }
+
   // Check if the string has already been processed, and if so return the
   // cached result.
-  if (isset($cache['strings'][$string])) {
-    return $cache['strings'][$string];
+  if (isset($cache['strings'][$langcode][$string])) {
+    return $cache['strings'][$langcode][$string];
   }
 
   // Remove all HTML tags from the string.
@@ -261,7 +274,7 @@ function pathauto_cleanstring($string) {
 
   // Optionally transliterate (by running through the Transliteration module)
   if ($cache['transliterate']) {
-    $output = transliteration_get($output);
+    $output = transliteration_get($output, $cache['reduce_ascii'] ? '' : '?', $langcode);
   }
 
   // Replace or drop punctuation based on user settings
@@ -295,7 +308,7 @@ function pathauto_cleanstring($string) {
   $output = pathauto_truncate_utf8($output, $cache['maxlength'], TRUE);
 
   // Cache this result in the static array.
-  $cache['strings'][$string] = $output;
+  $cache['strings'][$langcode][$string] = $output;
 
   return $output;
 }
@@ -325,21 +338,20 @@ function _pathauto_clean_separators($string, $separator = NULL) {
 
   $output = $string;
 
-  // Clean duplicate or trailing separators.
   if (strlen($separator)) {
-    // Escape the separator.
-    $seppattern = preg_quote($separator, '/');
-
     // Trim any leading or trailing separators.
-    $output = preg_replace("/^$seppattern+|$seppattern+$/", '', $output);
+    $output = trim($output, $separator);
 
-    // Replace trailing separators around slashes.
-    if ($separator !== '/') {
-      $output = preg_replace("/$seppattern+\/|\/$seppattern+/", "/", $output);
-    }
+    // Escape the separator for use in regular expressions.
+    $seppattern = preg_quote($separator, '/');
 
     // Replace multiple separators with a single one.
     $output = preg_replace("/$seppattern+/", $separator, $output);
+
+    // Replace trailing separators around slashes.
+    if ($separator !== '/') {
+      $output = preg_replace("/\/+$seppattern\/+|$seppattern\/+|\/+$seppattern/", "/", $output);
+    }
   }
 
   return $output;
@@ -369,11 +381,14 @@ function pathauto_clean_alias($alias) {
 
   $output = $alias;
 
-  // Trim duplicate, leading, and trailing back-slashes.
-  $output = _pathauto_clean_separators($output, '/');
-
-  // Trim duplicate, leading, and trailing separators.
+  // Trim duplicate, leading, and trailing separators. Do this before cleaning
+  // backslashes since a pattern like "[token1]/[token2]-[token3]/[token4]"
+  // could end up like "value1/-/value2" and if backslashes were cleaned first
+  // this would result in a duplicate blackslash.
   $output = _pathauto_clean_separators($output);
+
+  // Trim duplicate, leading, and trailing backslashes.
+  $output = _pathauto_clean_separators($output, '/');
 
   // Shorten to a logical place based on word boundaries.
   $output = pathauto_truncate_utf8($output, $cache['maxlength'], TRUE);
@@ -415,6 +430,18 @@ function pathauto_clean_alias($alias) {
 function pathauto_create_alias($module, $op, $source, $data, $entity_id = NULL, $type = NULL, $language = '') {
   // Retrieve and apply the pattern for this content type.
   $pattern = pathauto_pattern_load_by_entity($module, $type, $language);
+
+  // Allow other modules to alter the pattern.
+  $context = array(
+    'module' => $module,
+    'op' => $op,
+    'source' => $source,
+    'data' => $data,
+    'type' => $type,
+    'language' => &$language,
+  );
+  drupal_alter('pathauto_pattern', $pattern, $context);
+
   if (empty($pattern)) {
     // No pattern? Do nothing (otherwise we may blow away existing aliases...)
     return '';
@@ -426,7 +453,7 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id = NULL, 
     $source = $data;
   }
   elseif (is_array($data) && !isset($data['tokens']) && !isset($data['values'])) {
-    $placeholders = pathauto_get_placeholders(key($data), current($data), $pattern);
+    $placeholders = pathauto_get_placeholders(key($data), current($data), $pattern, array('language' => (object) array('language' => $language)));
   }
   else {
     $placeholders = $data;
@@ -459,15 +486,8 @@ function pathauto_create_alias($module, $op, $source, $data, $entity_id = NULL, 
   $alias = pathauto_clean_alias($alias);
 
   // Allow other modules to alter the alias.
-  $context = array(
-    'module' => $module,
-    'op' => $op,
-    'source' => &$source,
-    'data' => $data,
-    'type' => $type,
-    'language' => &$language,
-    'pattern' => $pattern,
-  );
+  $context['source'] = &$source;
+  $context['pattern'] = $pattern;
   drupal_alter('pathauto_alias', $alias, $context);
 
   // If we have arrived at an empty string, discontinue.
@@ -529,7 +549,7 @@ function pathauto_alias_uniquify(&$alias, $source, $langcode) {
   do {
     // Append an incrementing numeric suffix until we find a unique alias.
     $unique_suffix = $separator . $i;
-    $alias = truncate_utf8($original_alias, $maxlength - drupal_strlen($unique_suffix, TRUE)) . $unique_suffix;
+    $alias = pathauto_truncate_utf8($original_alias, $maxlength - drupal_strlen($unique_suffix), TRUE) . $unique_suffix;
     $i++;
   } while (_pathauto_alias_exists($alias, $source, $langcode));
 }
@@ -699,8 +719,9 @@ function _pathauto_verbose($message = NULL, $op = NULL) {
  *   Tokens for that object formatted in the way that
  *   Pathauto expects to see them.
  */
-function pathauto_get_placeholders($type, $object, $text = '') {
-  $options = array('pathauto' => TRUE);
+function pathauto_get_placeholders($type, $object, $text = '', array $options = array()) {
+  $options += array('pathauto' => TRUE);
+
   $full = token_get_values($type, $object, TRUE, $options);
 
   // Attempt to reduce the tokens to only the ones that will actually be used
@@ -743,7 +764,10 @@ function pathauto_clean_token_values($full, $options = array()) {
       // the 'pathauto' option was passed to token_get_values(), then the token
       // should have each segment cleaned, and then glued back together to
       // construct a value resembling an URL.
-      $segments = array_map('pathauto_cleanstring', $value);
+      $segments = array();
+      foreach ($value as $segment) {
+        $segments[] = pathauto_cleanstring($segment, $options);
+      }
       $replacements[$token] = implode('/', $segments);
     }
     elseif (preg_match('/(path|alias|url|url-brief)(-raw)?$/', $token)) {
@@ -752,7 +776,7 @@ function pathauto_clean_token_values($full, $options = array()) {
     }
     else {
       // Token is not an URL, so it should have its value cleaned.
-      $replacements[$token] = pathauto_cleanstring($value);
+      $replacements[$token] = pathauto_cleanstring($value, $options);
     }
   }
   return $replacements;

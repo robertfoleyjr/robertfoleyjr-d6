@@ -167,8 +167,6 @@ function openid_begin($claimed_id, $return_to = '', $form_values = array()) {
     return;
   }
 
-  drupal_session_start();
-
   // Store discovered information in the users' session so we don't have to rediscover.
   $_SESSION['openid']['service'] = $services[0];
   // Store the claimed id
@@ -243,10 +241,34 @@ function openid_complete($response = array()) {
         if (openid_verify_assertion($service, $response)) {
           // If the returned claimed_id is different from the session claimed_id,
           // then we need to do discovery and make sure the op_endpoint matches.
-          if ($service['version'] == 2 && $response['openid.claimed_id'] != $claimed_id) {
-            $disco = openid_discovery($response['openid.claimed_id']);
-            if ($disco[0]['uri'] != $service['uri']) {
-              return $response;
+          if ($service['version'] == 2) {
+            // Returned Claimed Identifier could contain unique fragment
+            // identifier to allow identifier recycling so we need to preserve
+            // it in the response.
+            $response_claimed_id = _openid_normalize($response['openid.claimed_id']);
+
+            if ($response_claimed_id != $claimed_id || $response_claimed_id != $response['openid.identity']) {
+              $disco = openid_discovery($response['openid.claimed_id']);
+
+              if ($disco[0]['uri'] != $service['uri']) {
+                return $response;
+              }
+
+              if (!empty($disco[0]['localid'])) {
+                $identity = $disco[0]['localid'];
+              }
+              else if (!empty($disco[0]['delegate'])) {
+                $identity = $disco[0]['delegate'];
+              }
+              else {
+                $identity = FALSE;
+              }
+
+              // The OP-Local Identifier (if different than the Claimed
+              // Identifier) must be present in the XRDS document.
+              if ($response_claimed_id != $response['openid.identity'] && (!$identity || $identity != $response['openid.identity'])) {
+                return $response;
+              }
             }
           }
           else {
@@ -553,7 +575,7 @@ function openid_verify_assertion($service, $response) {
   // http://openid.net/specs/openid-authentication-2_0.html#rfc.section.11.4
   // Verify the signatures.
   $valid = FALSE;
-  $association = db_fetch_object(db_query("SELECT * FROM {openid_association} WHERE assoc_handle = '%s'", $response['openid.assoc_handle']));
+  $association = db_fetch_object(db_query("SELECT * FROM {openid_association} WHERE idp_endpoint_uri = '%s' AND assoc_handle = '%s'", $service['uri'], $response['openid.assoc_handle']));
   if ($association && isset($association->session_type)) {
     // http://openid.net/specs/openid-authentication-2_0.html#rfc.section.11.4.2
     // Verification using an association.

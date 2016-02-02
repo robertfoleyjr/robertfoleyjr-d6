@@ -84,7 +84,7 @@ function views_rss_core_preprocess_channel_image(&$variables) {
   $subelements = array(
     'url' => array(
       'element' => 'url',
-      'value' => file_create_url($path),
+      'value' => url($path, array('absolute' => TRUE)),
     ),
     'title' => array(
       'element' => 'title',
@@ -219,7 +219,7 @@ function views_rss_core_preprocess_item_source(&$variables) {
 
   $view_title = $variables['view']->get_title();
   $variables['value'] = array(
-    'value' => ($view_title) ? $view_title : variable_get('site_name', t('Drupal')),
+    'value' => check_plain($view_title ? $view_title : variable_get('site_name', t('Drupal'))),
     'arguments' => array(
       'url' => $url,
     ),

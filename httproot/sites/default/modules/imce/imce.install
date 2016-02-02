@@ -118,3 +118,16 @@ function imce_update_6201() {
   db_create_table($ret, 'imce_files', $table);
   return $ret;
 }
+
+/**
+ * Fixes misconfigurations where anonymous user is given User-1 profile
+ */
+function imce_update_6202() {
+  $roles = variable_get('imce_roles_profiles', array());
+  $rid = DRUPAL_ANONYMOUS_RID;
+  if (!empty($roles[$rid]['pid']) && $roles[$rid]['pid'] == 1) {
+    $roles[$rid]['pid'] = '0';
+    variable_set('imce_roles_profiles', $roles);
+  }
+  return array();
+}

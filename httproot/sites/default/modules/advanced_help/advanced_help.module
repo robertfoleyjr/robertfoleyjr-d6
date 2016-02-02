@@ -1,13 +1,11 @@
 <?php
-// $Id: advanced_help.module,v 1.41 2008/10/28 17:33:47 merlinofchaos Exp $
 /**
- * @file advanced_help.module
- *
+ * @file
  * Pluggable system to provide advanced help facilities for Drupal and modules.
  *
  * Modules utilizing this help system should create a 'help' directory in their
- * module. Inside that directory place MODULENAME.help.ini which will be formatted
- * like this:
+ * module. Inside that directory place MODULENAME.help.ini which will be
+ * formatted like this:
  *
  * @code
  * [buses]
@@ -18,7 +16,8 @@
  * title = "Title of topic"
  * file = filename of topic, without the .html extension
  * weight = the importance of the topic on the index page
- * parent = the optional topic parent to use in the breadcrumb. Can be either topic or module%topic
+ * parent = the optional topic parent to use in the breadcrumb.
+ * Can be either topic or module%topic
  * @endcode
  *
  * All topics are addressed by the module that provides the topic, and the topic
@@ -34,12 +33,12 @@
  */
 
 /**
- * Implementation of hook_menu().
+ * Implements hook_menu().
  */
 function advanced_help_menu() {
   // View help topic index.
-
-  // This is structured a little oddly so POTX can properly handle the translation.
+  //
+  // This is structured little oddly so that POTX can handle the translation.
   if (module_exists('help')) {
     $items['admin/advanced_help'] = array(
       'title' => 'Advanced help',
@@ -75,8 +74,8 @@ function advanced_help_menu() {
 }
 
 /**
-* Inplementation of hook_menu_alter().
-**/
+ * Implements hook_menu_alter().
+ */
 function advanced_help_menu_alter(&$callbacks) {
   // We need to fix the menu item provided by search module to restrict access.
   $callbacks['search/advanced_help/%menu_tail']['access callback'] = 'user_access';
@@ -84,7 +83,7 @@ function advanced_help_menu_alter(&$callbacks) {
 }
 
 /**
- * Implementation of hook_theme().
+ * Implements hook_theme().
  */
 function advanced_help_theme() {
   $hooks['advanced_help_topic'] = array(
@@ -99,6 +98,9 @@ function advanced_help_theme() {
   return $hooks;
 }
 
+/**
+ * Helper function to sort topics.
+ */
 function advanced_help_uasort($id_a, $id_b) {
   $topics = advanced_help_get_topics();
   list($module_a, $topic_a) = $id_a;
@@ -156,8 +158,10 @@ function advanced_help_search_view() {
 
   $popup = !empty($_GET['popup']) && user_access('view advanced help popup');
   if ($popup) {
-    $GLOBALS['devel_shutdown'] = FALSE; // Prevent devel module from spewing.
-    module_invoke('admin_menu', 'suppress'); // Suppress admin_menu.
+    // Prevent devel module from spewing.
+    $GLOBALS['devel_shutdown'] = FALSE;
+    // Suppress admin_menu.
+    module_invoke('admin_menu', 'suppress');
     drupal_set_breadcrumb(array_reverse($breadcrumb));
     print theme('advanced_help_popup', $output);
     return;
@@ -219,7 +223,7 @@ function advanced_help_index_page($module = '') {
           $name = $settings[$module]['name'];
         }
         else {
-         $name = t($module_name);
+          $name = t($module_name);
         }
         $items[] = advanced_help_l($name, "admin/advanced_help/$module");
       }
@@ -231,8 +235,10 @@ function advanced_help_index_page($module = '') {
 
   $popup = !empty($_GET['popup']) && user_access('view advanced help popup');
   if ($popup) {
-    $GLOBALS['devel_shutdown'] = FALSE; // Prevent devel module from spewing.
-    module_invoke('admin_menu', 'suppress'); // Suppress admin_menu.
+    // Prevent devel module from spewing.
+    $GLOBALS['devel_shutdown'] = FALSE;
+    // Suppress admin_menu.
+    module_invoke('admin_menu', 'suppress');
     drupal_set_breadcrumb(array_reverse($breadcrumb));
     print theme('advanced_help_popup', $output);
     return;
@@ -279,7 +285,7 @@ function advanced_help_get_topic_hierarchy(&$topics) {
       if (empty($info['parent'])) {
         $parent = '';
       }
-      else if (strpos($info['parent'], '%')) {
+      elseif (strpos($info['parent'], '%')) {
         list($parent_module, $parent) = explode('%', $info['parent']);
         if (empty($topics[$parent_module][$parent])) {
           // If it doesn't exist, top level.
@@ -404,8 +410,10 @@ function advanced_help_topic_page($module, $topic) {
   }
 
   if ($popup) {
-    $GLOBALS['devel_shutdown'] = FALSE; // Prevent devel module from spewing.
-    module_invoke('admin_menu', 'suppress'); // Suppress admin_menu.
+    // Prevent devel module from spewing.
+    $GLOBALS['devel_shutdown'] = FALSE;
+    // Suppress admin_menu.
+    module_invoke('admin_menu', 'suppress');
     drupal_set_breadcrumb(array_reverse($breadcrumb));
     print theme('advanced_help_popup', $output);
     return;
@@ -418,20 +426,24 @@ function advanced_help_topic_page($module, $topic) {
 }
 
 /**
- * Implementation of hook_perm().
+ * Implements hook_perm().
  */
 function advanced_help_perm() {
-  return array('view advanced help topic', 'view advanced help popup', 'view advanced help index');
+  return array(
+    'view advanced help topic',
+    'view advanced help popup',
+    'view advanced help index',
+  );
 }
 
 /**
  * Display a help icon with a link to view the topic in a popup.
  *
- * @param $module
+ * @param string $module
  *   The module that owns this help topic.
- * @param $topic
+ * @param string $topic
  *   The identifier for the topic
- * @param $type
+ * @param string $type
  *   - 'icon' to display the question mark icon
  *   - 'title' to display the topic's title
  *   - any other text to display the text. Be sure to t() it!
@@ -447,10 +459,12 @@ function theme_advanced_help_topic($module, $topic, $type = 'icon') {
       $text = '<span>' . t('Help') . '</span>';
       $class = 'advanced-help-link';
       break;
+
     case 'title':
       $text = $info['title'];
       $class = 'advanced-help-title';
       break;
+
     default:
       $class = 'advanced-help-title';
       $text = $type;
@@ -462,18 +476,18 @@ function theme_advanced_help_topic($module, $topic, $type = 'icon') {
     return l($text, "help/$module/$topic", array(
       'attributes' => array(
         'class' => $class,
-        'onclick' => "var w=window.open(this.href, 'advanced_help_window', 'width=". $info['popup width'] .",height=". $info['popup height'] .",scrollbars,resizable'); w.focus(); return false;",
-        'title' => $info['title']
+        'onclick' => "var w=window.open(this.href, 'advanced_help_window', 'width=" . $info['popup width'] . ",height=" . $info['popup height'] . ",scrollbars,resizable'); w.focus(); return false;",
+        'title' => $info['title'],
       ),
       'query' => array('popup' => TRUE),
       'html' => TRUE)
     );
   }
-  else {
+  elseif (user_access('view advanced help topic')) {
     return l($text, "help/$module/$topic", array(
       'attributes' => array(
         'class' => $class,
-        'title' => $info['title']
+        'title' => $info['title'],
       ),
       'html' => TRUE)
     );
@@ -503,9 +517,12 @@ function advanced_help_get_topic_file_info($module, $topic) {
 
   // Search paths:
   $paths = array(
-    path_to_theme() . '/help', // Allow theme override.
-    drupal_get_path('module', $module) . "/translations/help/$language->language", // Translations.
-    $info['path'], // In same directory as .inc file.
+    // Allow theme override.
+    path_to_theme() . '/help',
+    // Translations.
+    drupal_get_path('module', $module) . "/translations/help/$language->language",
+    // In same directory as .inc file.
+    $info['path'],
   );
 
   foreach ($paths as $path) {
@@ -524,11 +541,29 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
     $info = advanced_help_get_topic($module, $topic);
     $file = "./$file_info[path]/$file_info[file]";
 
-    // @todo is this trusted output?
     $output = file_get_contents($file);
+    if (isset($info['readme file']) && $info['readme file']) {
+      $ext = pathinfo($file, PATHINFO_EXTENSION);
+      if ('md' == $ext && module_exists('markdown')) {
+        $result = module_invoke('markdown', 'filter', 'process', 0, -1, $output);
+        $output = '<div class="advanced-help-topic"><br/>' . filter_xss_admin($result) . '</div>';
+      }
+      else {
+        $output =
+	  '<p>' .
+	  t('If you install the !module module, this text below will be filtered by the module, producing rich text.',
+	  array('!module' => l(t('Markdown filter'),
+	  'https://www.drupal.org/project/markdown',
+	  array('attributes' => array('title' => t('Link to project.')))))) . '</p>' .
+          '<div class="advanced-help-topic"><pre class="readme">' . check_plain($output) .
+	  '</pre></div>';
+      }
+      return $output;
+    }
+
     // Make some exchanges. The strtr is because url() translates $ into %24
     // but we need to change it back for the regex replacement.
-
+    //
     // Change 'topic:' to the URL for another help topic.
     if ($popup) {
       $output = preg_replace('/href="topic:([^"]+)"/', 'href="' . strtr(url('help/$1', array('query' => 'popup=true')), array('%24' => '$')) . '"', $output);
@@ -546,19 +581,19 @@ function advanced_help_view_topic($module, $topic, $popup = FALSE) {
     // Change 'path:' to the URL to the base help directory.
     $output = preg_replace('/href="path:([^"]+)"/', 'href="' . $base_path . $info['path'] . '/$1"', $output);
     $output = preg_replace('/src="path:([^"]+)"/', 'src="' . $base_path . $info['path'] . '/$1"', $output);
-    $output = str_replace('&path&', $base_path . $info['path'] .'/', $output);
+    $output = str_replace('&path&', $base_path . $info['path'] . '/', $output);
 
     // Change 'trans_path:' to the URL to the actual help directory.
     $output = preg_replace('/href="trans_path:([^"]+)"/', 'href="' . $base_path . $file_info['path'] . '/$1"', $output);
     $output = preg_replace('/src="trans_path:([^"]+)"/', 'src="' . $base_path . $file_info['path'] . '/$1"', $output);
-    $output = str_replace('&trans_path&', $base_path . $file_info['path'] .'/', $output);
+    $output = str_replace('&trans_path&', $base_path . $file_info['path'] . '/', $output);
 
     // Change 'base_url:' to the URL to the site.
     $output = preg_replace('/href="base_url:([^"]+)"/', 'href="' . strtr(url('$1'), array('%24' => '$')) . '"', $output);
     $output = preg_replace('/src="base_url:([^"]+)"/', 'src="' . strtr(url('$1'), array('%24' => '$')) . '"', $output);
     $output = str_replace('&base_url&', $base_path, $output);
 
-    // Run the line break filter if requested
+    // Run the line break filter if requested.
     if (!empty($info['line break'])) {
       // Remove the header since it adds an extra <br /> to the filter.
       $output = preg_replace('/^<!--[^\n]*-->\n/', '', $output);
@@ -647,11 +682,17 @@ function advanced_help_get_topics() {
   return $cache['topics'];
 }
 
+/**
+ * Returns advanced help settings.
+ */
 function advanced_help_get_settings() {
   $cache = _advanced_help_parse_ini();
   return $cache['settings'];
 }
 
+/**
+ * Funtion to parse ini / txt files.
+ */
 function _advanced_help_parse_ini() {
   static $cache = NULL;
 
@@ -659,8 +700,9 @@ function _advanced_help_parse_ini() {
     $cache = array('topics' => array(), 'settings' => array());
 
     $help_path = drupal_get_path('module', 'advanced_help') . '/modules';
-    foreach (module_list() as $module) {
-      $module_path = drupal_get_path('module', $module);
+    foreach (array_merge(module_list(), list_themes()) as $plugin) {
+      $module = is_string($plugin) ? $plugin : $plugin->name;
+      $module_path = drupal_get_path(is_string($plugin) ? 'module' : 'theme', $module);
       $info = array();
       if (file_exists("$module_path/help/$module.help.ini")) {
         $path = "$module_path/help";
@@ -671,11 +713,18 @@ function _advanced_help_parse_ini() {
         $info = parse_ini_file("./$help_path/$module/$module.help.ini", TRUE);
       }
       elseif (!file_exists("$module_path/help")) {
-        // Look for one or more README files.
-        $files = file_scan_directory("./$module_path", '^(README|readme).*\.(txt|TXT)$', array('.', '..', 'CVS'), 0, FALSE);
+        // Look for one or more README files (old erg).
+        $files = file_scan_directory("./$module_path",
+          '^(README|readme).*\.(txt|TXT|md|MD)$', array('.', '..', 'CVS'),
+          0, FALSE);
         $path = "./$module_path";
         foreach ($files as $name => $fileinfo) {
-          $info[$fileinfo->basename] = array('line break' => TRUE, 'readme file' => TRUE, 'file' => $fileinfo->basename, 'title' => $fileinfo->name);
+          $info[$fileinfo->basename] = array(
+            'line break' => TRUE,
+            'readme file' => TRUE,
+            'file' => $fileinfo->basename,
+            'title' => $fileinfo->name,
+          );
         }
       }
 
@@ -703,7 +752,7 @@ function _advanced_help_parse_ini() {
         }
 
         foreach ($info as $name => $topic) {
-          // Each topic should have a name, a title, a file and of course the path.
+          // Each topic should have a name, a title, a file and the path.
           $file = !empty($topic['file']) ? $topic['file'] : $name;
           $cache['topics'][$module][$name] = array(
             'name' => $name,
@@ -712,8 +761,11 @@ function _advanced_help_parse_ini() {
             'parent' => isset($topic['parent']) ? $topic['parent'] : 0,
             'popup width' => isset($topic['popup width']) ? $topic['popup width'] : 500,
             'popup height' => isset($topic['popup height']) ? $topic['popup height'] : 500,
-            'file' => isset($topic['readme file']) ? $file : $file . '.html', // require extension
-            'path' => $path, // not in .ini file
+            // Require extension.
+            'file' => isset($topic['readme file']) ? $file : $file . '.html',
+            // Not in .ini file.
+            'path' => $path,
+            'readme file' => isset($topic['readme file']) ? $topic['readme file'] : (isset($cache['settings'][$module]['readme file']) ? $cache['settings'][$module]['readme file'] : FALSE),
             'line break' => isset($topic['line break']) ? $topic['line break'] : (isset($cache['settings'][$module]['line break']) ? $cache['settings'][$module]['line break'] : FALSE),
             'navigation' => isset($topic['navigation']) ? $topic['navigation'] : (isset($cache['settings'][$module]['navigation']) ? $cache['settings'][$module]['navigation'] : TRUE),
             'css' => isset($topic['css']) ? $topic['css'] : (isset($cache['settings'][$module]['css']) ? $cache['settings'][$module]['css'] : NULL),
@@ -727,15 +779,17 @@ function _advanced_help_parse_ini() {
 }
 
 /**
- * Implementation of hook_search()
+ * Implements hook_search().
  */
-function advanced_help_search($op = 'search', $keys = null) {
+function advanced_help_search($op = 'search', $keys = NULL) {
   switch ($op) {
     case 'name':
       return t('Help');
+
     case 'reset':
       variable_del('advanced_help_last_cron');
       return;
+
     case 'search':
       $topics = advanced_help_get_topics();
       $find = do_search($keys, 'help');
@@ -758,16 +812,20 @@ function advanced_help_search($op = 'search', $keys = null) {
         }
         $info = $topics[$sid->module][$sid->topic];
         $text = advanced_help_view_topic($sid->module, $sid->topic);
-        $results[] = array('link' => advanced_help_url("help/$sid->module/$sid->topic"),
-                           'title' => $info['title'],
-                           'snippet' => search_excerpt($keys, $text));
+        $results[] = array(
+          'link' => advanced_help_url("help/$sid->module/$sid->topic"),
+          'title' => $info['title'],
+          'snippet' => search_excerpt($keys, $text),
+        );
       }
       return $results;
   }
 }
 
 /**
- * Get or create an sid (search id) that correllates to each topic for
+ * Gets search id for each topic.
+ *
+ * Get or create an sid (search id) that correlates to each topic for
  * the search system.
  */
 function advanced_help_get_sids(&$topics) {
@@ -784,7 +842,7 @@ function advanced_help_get_sids(&$topics) {
 }
 
 /**
- * Implementation of hook_update_index().
+ * Implements hook_update_index().
  */
 function advanced_help_update_index() {
   global $language;
@@ -845,13 +903,16 @@ function advanced_help_update_index() {
 function template_preprocess_advanced_help_popup(&$variables) {
   // Add favicon.
   if (theme_get_setting('toggle_favicon')) {
-    drupal_set_html_head('<link rel="shortcut icon" href="'. check_url(theme_get_setting('favicon')) .'" type="image/x-icon" />');
+    drupal_set_html_head('<link rel="shortcut icon" href="' . check_url(theme_get_setting('favicon')) . '" type="image/x-icon" />');
   }
 
   global $theme;
   // Construct page title.
   if (drupal_get_title()) {
-    $head_title = array(strip_tags(drupal_get_title()), variable_get('site_name', 'Drupal'));
+    $head_title = array(
+      strip_tags(drupal_get_title()),
+      variable_get('site_name', 'Drupal'),
+    );
   }
   else {
     $head_title = array(variable_get('site_name', 'Drupal'));

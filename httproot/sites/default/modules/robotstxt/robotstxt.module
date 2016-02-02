@@ -64,6 +64,7 @@ function robotstxt_robots() {
 
   drupal_set_header('Content-type: text/plain');
   echo implode("\n", $content);
+  drupal_page_footer();
   exit;
 }
 

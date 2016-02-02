@@ -6,9 +6,9 @@ dependencies[]= themekey
 dependencies[]= features
 package = ThemeKey
 
-; Information added by drupal.org packaging script on 2012-11-16
-version = "6.x-4.0+2-dev"
+; Information added by  packaging script on 2013-11-20
+version = "6.x-4.1"
 core = "6.x"
 project = "themekey"
-datestamp = "1353073566"
+datestamp = "1384958606"
 

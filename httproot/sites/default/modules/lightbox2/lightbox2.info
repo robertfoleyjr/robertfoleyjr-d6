@@ -2,9 +2,9 @@ name = Lightbox2
 description = Enables Lightbox2 for Drupal
 core = 6.x
 
-; Information added by drupal.org packaging script on 2011-05-24
-version = "6.x-1.x-dev"
+; Information added by drupal.org packaging script on 2013-09-30
+version = "6.x-1.11+3-dev"
 core = "6.x"
 project = "lightbox2"
-datestamp = "1306239226"
+datestamp = "1380584879"
 

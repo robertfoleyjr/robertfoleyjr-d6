@@ -1,4 +1,3 @@
-// $Id: extlink.js,v 1.4.2.12 2010/05/26 01:25:56 quicksketch Exp $
 (function ($) {
 
 function extlinkAttach(context) {
@@ -24,13 +23,25 @@ function extlinkAttach(context) {
   // Extra internal link matching.
   var extInclude = false;
   if (Drupal.settings.extlink.extInclude) {
-    extInclude = new RegExp(Drupal.settings.extlink.extInclude.replace(/\\/, '\\'));
+    extInclude = new RegExp(Drupal.settings.extlink.extInclude.replace(/\\/, '\\'), "i");
   }
 
   // Extra external link matching.
   var extExclude = false;
   if (Drupal.settings.extlink.extExclude) {
-    extExclude = new RegExp(Drupal.settings.extlink.extExclude.replace(/\\/, '\\'));
+    extExclude = new RegExp(Drupal.settings.extlink.extExclude.replace(/\\/, '\\'), "i");
+  }
+
+  // Extra external link CSS selector exclusion.
+  var extCssExclude = false;
+  if (Drupal.settings.extlink.extCssExclude) {
+    extCssExclude = Drupal.settings.extlink.extCssExclude;
+  }
+
+  // Extra external link CSS selector explicit.
+  var extCssExplicit = false;
+  if (Drupal.settings.extlink.extCssExplicit) {
+    extCssExplicit = Drupal.settings.extlink.extCssExplicit;
   }
 
   // Find all links which are NOT internal and begin with http (as opposed
@@ -41,13 +52,21 @@ function extlinkAttach(context) {
   // available in jQuery 1.0 (Drupal 5 default).
   var external_links = new Array();
   var mailto_links = new Array();
-  $("a:not(." + Drupal.settings.extlink.extClass + ", ." + Drupal.settings.extlink.mailtoClass + ")", context).each(function(el) {
+  $("a:not(." + Drupal.settings.extlink.extClass + ", ." + Drupal.settings.extlink.mailtoClass + "), area:not(." + Drupal.settings.extlink.extClass + ", ." + Drupal.settings.extlink.mailtoClass + ")", context).each(function(el) {
     try {
       var url = this.href.toLowerCase();
-      if (url.indexOf('http') == 0 && (!url.match(internal_link) || (extInclude && url.match(extInclude))) && !(extExclude && url.match(extExclude))) {
+      if (url.indexOf('http') == 0 
+        && ((!url.match(internal_link) && !(extExclude && url.match(extExclude))) || (extInclude && url.match(extInclude)))
+        && !(extCssExclude && $(this).parents(extCssExclude).length > 0)
+        && !(extCssExplicit && $(this).parents(extCssExplicit).length < 1)) {
         external_links.push(this);
       }
-      else if (url.indexOf('mailto:') == 0) {
+      // Do not include area tags with begin with mailto: (this prohibits
+      // icons from being added to image-maps).
+      else if (this.tagName != 'AREA' 
+        && url.indexOf('mailto:') == 0 
+        && !(extCssExclude && $(this).parents(extCssExclude).length > 0)
+        && !(extCssExplicit && $(this).parents(extCssExplicit).length < 1)) {
         mailto_links.push(this);
       }
     }
@@ -84,17 +103,19 @@ function extlinkAttach(context) {
     $(external_links).attr('target', Drupal.settings.extlink.extTarget);
   }
 
-  if (Drupal.settings.extlink.extAlert) {
-    // Add pop-up click-through dialog.
-    $(external_links).click(function(e) {
-     return confirm(Drupal.settings.extlink.extAlertText);
-    });
-  }
+  Drupal.extlink = Drupal.extlink || {};
 
-  // Work around for Internet Explorer box model problems.
-  if (($.support && !($.support.boxModel === undefined) && !$.support.boxModel) || ($.browser.msie && parseInt($.browser.version) <= 7)) {
-    $('span.ext, span.mailto').css('display', 'inline-block');
-  }
+  // Set up default click function for the external links popup. This should be
+  // overridden by modules wanting to alter the popup.
+  Drupal.extlink.popupClickHandler = Drupal.extlink.popupClickHandler || function() {
+    if (Drupal.settings.extlink.extAlert) {
+      return confirm(Drupal.settings.extlink.extAlertText);
+    }
+   }
+  
+  $(external_links).click(function(e) {
+    return Drupal.extlink.popupClickHandler(e);
+  });
 }
 
 Drupal.behaviors.extlink = function(context) {

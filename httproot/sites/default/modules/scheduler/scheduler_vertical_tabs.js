@@ -1,4 +1,3 @@
-// $Id: scheduler_vertical_tabs.js,v 1.1.2.2 2010/01/17 16:24:33 ericschaefer Exp $
 
 Drupal.verticalTabs = Drupal.verticalTabs || {};
 

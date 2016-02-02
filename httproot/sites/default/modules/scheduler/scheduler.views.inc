@@ -1,5 +1,4 @@
 <?php
-// $Id: scheduler.views.inc,v 1.1.2.5 2010/12/22 14:28:57 ericschaefer Exp $
 
 /**
  * @file

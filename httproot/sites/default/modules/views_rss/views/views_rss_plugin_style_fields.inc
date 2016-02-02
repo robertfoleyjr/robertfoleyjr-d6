@@ -356,6 +356,7 @@ class views_rss_plugin_style_fields extends views_plugin_style {
     $rendered = $raw = array();
     $keys = array_keys($this->view->field);
     foreach ($rows as $count => $row) {
+      $this->view->row_index = $count;
       foreach ($keys as $id) {
         $rendered[$count][$id] = $this->view->field[$id]->theme($row);
         // Also let's keep raw value for further processing.

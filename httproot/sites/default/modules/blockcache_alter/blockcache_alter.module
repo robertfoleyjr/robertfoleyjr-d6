@@ -501,6 +501,7 @@ function _blockcache_alter_get_cache_id($module, $delta) {
       $block_cache[$row->module][$row->delta] = $row->cache;
     }
   }
+  $block = new stdClass;
   $block->cache = $block_cache[$module][$delta];
 
   // User 1 being out of the regular 'roles define permissions' schema,

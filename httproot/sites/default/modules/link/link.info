@@ -6,9 +6,9 @@ core = 6.x
 files[] = link.migrate.inc
 
 
-; Information added by drupal.org packaging script on 2013-02-10
-version = "6.x-2.10+0-dev"
+; Information added by Drupal.org packaging script on 2014-02-28
+version = "6.x-2.11"
 core = "6.x"
 project = "link"
-datestamp = "1360460028"
+datestamp = "1393559923"
 

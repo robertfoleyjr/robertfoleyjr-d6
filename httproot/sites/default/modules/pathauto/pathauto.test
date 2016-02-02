@@ -427,6 +427,34 @@ class PathautoUnitTestCase extends PathautoTestHelper {
     node_save($node);
     $this->assertEntityAlias('node', $node, 'safe-value');
   }
+
+  /**
+   * Test pathauto_clean_alias().
+   */
+  function testCleanAlias() {
+    $tests = array();
+    $tests['one/two/three'] = 'one/two/three';
+    $tests['/one/two/three/'] = 'one/two/three';
+    $tests['one//two///three'] = 'one/two/three';
+    $tests['one/two--three/-/--/-/--/four---five'] = 'one/two-three/four-five';
+    $tests['one/-//three--/four'] = 'one/three/four';
+    foreach ($tests as $input => $expected) {
+      $output = pathauto_clean_alias($input);
+      $this->assertEqual($output, $expected, t("pathauto_clean_alias('@input') expected '@expected', actual '@output'", array('@input' => $input, '@expected' => $expected, '@output' => $output)));
+    }
+  }
+
+  function testPathAliasUniquifyWordsafe() {
+    variable_set('pathauto_max_length', 25);
+
+    $node_1 = $this->drupalCreateNode(array('title' => 'thequick brownfox jumpedover thelazydog', 'type' => 'page'));
+    $node_2 = $this->drupalCreateNode(array('title' => 'thequick brownfox jumpedover thelazydog', 'type' => 'page'));
+
+    // Check that pathauto_alias_uniquify is calling truncate_utf8 with $wordsafe param set to TRUE.
+    // If it doesn't path alias result would be content/thequick-brownf-0
+    $this->assertEntityAlias('node', $node_1, 'content/thequick-brownfox');
+    $this->assertEntityAlias('node', $node_2, 'content/thequick-0');
+  }
 }
 
 /**

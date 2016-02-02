@@ -1,7 +1,9 @@
-ThemeKey Properties 6.x-4.3, 2012-xx-xx
+ThemeKey Properties 6.x-4.3, 2014-03-07
 ---------------------------------------
 [#1792204] psynaptic: Invalid multibyte sequence in themekey_properties_validators.inc
 [#1848130] mkalkbrenner: Backport system:month and system:day_of_month
+[#1916338] dwatson, mkalkbrenner: Undefined index: HTTP_USER_AGENT in themekey_dummy2user_os()
+[#2039581] Nosta, mkalkbrenner: wrong boolean values in system:session
 
 
 ThemeKey Properties 6.x-4.2, 2012-09-12

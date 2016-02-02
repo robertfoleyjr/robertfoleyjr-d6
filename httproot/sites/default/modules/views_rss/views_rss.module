@@ -166,7 +166,7 @@ function views_rss_rewrite_relative_paths(&$element) {
     || !empty($element['view']->style_plugin->options['feed_settings']['absolute_paths'])
   ) {
     global $base_path;
-    $pattern = '/(src|href)=(\'|")' . preg_quote($base_path, '/') . '/';
+    $pattern = '/(src|href)=(\'|")[^\/]' . preg_quote($base_path, '/') . '/';
     $replacement = '$1=$2' . url('<front>', array('absolute' => TRUE));
     $element['value'] = preg_replace($pattern, $replacement, $element['value']);
   }
@@ -189,7 +189,7 @@ function views_rss_map_assoc($array) {
  */
 function views_rss_htmlspecialchars(&$element) {
   if (isset($element['value']) && !is_array($element['value'])) {
-    $element['value'] = check_plain(htmlspecialchars_decode($element['value'], ENT_QUOTES));
+    $element['value'] = check_plain(decode_entities($element['value']));
   }
 }
 

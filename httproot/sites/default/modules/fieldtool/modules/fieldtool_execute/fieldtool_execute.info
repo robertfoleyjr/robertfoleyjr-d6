@@ -4,9 +4,9 @@ dependencies[] = fieldtool
 core = 6.x
 php = 5.2
 
-; Information added by drupal.org packaging script on 2011-02-25
+; Information added by drupal.org packaging script on 2013-09-30
 version = "6.x-1.x-dev"
 core = "6.x"
 project = "fieldtool"
-datestamp = "1298619253"
+datestamp = "1380578766"
 

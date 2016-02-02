@@ -29,7 +29,7 @@ function views_rss_core_field_formatter_info() {
   // Generic file formatter for <enclosure> element.
   $formatters['enclosure_file'] = array(
     'label' => t('RSS <enclosure> element: file'),
-    'field types' => array('filefield'),
+    'field types' => array('filefield', 'text', 'link'),
   );
   return $formatters;
 }
@@ -40,9 +40,12 @@ function views_rss_core_field_formatter_info() {
  * but in reality it is just a standard theme callback.
  */
 function views_rss_core_field_formatter_view($variables) {
-
   // Inside a view $element may contain NULL data. In that case, just return.
-  if (empty($variables['#item']['fid'])) {
+  if (
+    empty($variables['#item']['fid'])
+    && empty($variables['#item']['url'])
+    && empty($variables['#item']['safe'])
+  ) {
     return;
   }
 
@@ -57,14 +60,23 @@ function views_rss_core_field_formatter_view($variables) {
       // Get file size of image preset file (if it has already been created,
       // otherwise just create it first and then get file size).
       $path = imagecache_create_path($preset_name, $variables['#item']['filepath']);
-      $real_path = realpath($path);
-      if (file_exists($real_path) || imagecache_build_derivative($preset['actions'], $variables['#item']['filepath'], $path)) {
-        $variables['#item']['filesize'] = filesize($real_path);
+      if (file_exists($path) || imagecache_build_derivative($preset['actions'], $variables['#item']['filepath'], $path)) {
+        $variables['#item']['filesize'] = filesize($path);
       }
     }
   }
   if (empty($uri)) {
-    $uri = url($variables['#item']['filepath'], array('absolute' => TRUE));
+    if (!empty($variables['#item']['filepath'])) {
+      $uri = url($variables['#item']['filepath'], array('absolute' => TRUE));
+    }
+    elseif (!empty($variables['#item']['url']) || !empty($variables['#item']['safe'])) {
+      $uri = !empty($variables['#item']['url']) ? $variables['#item']['url'] : $variables['#item']['safe'];
+      // Great idea to use get_headers() here by Dan Feidt,
+      // http://drupal.org/user/60005 Thanks Dan!
+      $headers = get_headers($uri, $format = 1);
+      $variables['#item']['filesize'] = $headers['Content-Length'];
+      $variables['#item']['filemime'] = $headers['Content-Type'];
+    }
   }
 
   // XML element array in format_xml_elements() format.
@@ -76,10 +88,10 @@ function views_rss_core_field_formatter_view($variables) {
       'type'   => $variables['#item']['filemime'],
     ),
   );
-  
+
   // Views do not pass #type variable to this theme function,
   // so we should be safe to assume that if this variable exists,
-  // we are displaying the field on a normal page, and in such case 
+  // we are displaying the field on a normal page, and in such case
   // return only XML markup instead of extended element array.
   if (isset($variables['#type']) && $variables['#type'] == 'markup') {
     return format_xml_elements(array($rss_element));

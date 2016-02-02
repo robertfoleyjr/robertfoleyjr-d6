@@ -446,8 +446,10 @@ function webform_submission_resend($form_state, $node, $submission) {
       '#value' => check_plain(webform_format_email_subject($email['subject'], $node, $submission)),
     );
 
-    $form['actions'] = array('#type' => 'markup');
-    $form['actions']['resend'] = array(
+    $form['actions'] = array(
+      '#type' => 'markup',
+    );
+    $form['actions']['submit'] = array(
       '#type' => 'submit',
       '#value' => t('Resend e-mails'),
     );

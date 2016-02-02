@@ -57,13 +57,13 @@ function twitter_pull_init() {
  * @param $themekey
  *     Theme key name to use for theming the output of Twitter API.
  */
-function twitter_pull_render($twitkey, $title = NULL, $num_items = NULL, $themekey = NULL) {
+function twitter_pull_render($twitkey, $title = NULL, $num_items = NULL, $themekey = NULL, $rts = NULL, $exclude_replies = NULL) {
   //-- Set defaults if empty arguments were passed
-  $title = (empty($title) && $title != FALSE ) ? t('Related Tweets') : $title;
+  $title = (empty($title) && $title != FALSE ) ? t('Related Tweets') : check_plain($title);
   $themekey = empty($themekey) ? 'twitter_pull_listing' : $themekey;
   $num_items = empty($num_items) ? twitter_pull_num_items() : $num_items;
 
-  $tweets = twitter_pull_retrieve($twitkey, $num_items);
+  $tweets = twitter_pull_retrieve($twitkey, $num_items, $rts, $exclude_replies);
 
   $ret = theme($themekey, $tweets, $twitkey, $title);
 
@@ -84,8 +84,12 @@ function twitter_pull_render($twitkey, $title = NULL, $num_items = NULL, $themek
  *     (prepended with #), or a search term.
  * @param $num_items
  *     Number of tweets to retrieve from Twitter. Can't be more than 200.
+ * @param $rts
+ *     If you want to retweets to be included in the results. Defaults to TRUE.
+ * @param $exclude_replies
+ *     If you want to exclude replies.
  */
-function twitter_pull_retrieve($twitkey, $num_items = NULL) {
+function twitter_pull_retrieve($twitkey, $num_items = NULL, $rts = NULL, $exclude_replies = NULL) {
   // If $num_items is not set, use the default value.
   // This value is checked more rigorously in twitter_puller->check_arguments().
   $num_items = (intval($num_items) > 0) ? intval($num_items) : twitter_pull_num_items();
@@ -102,6 +106,8 @@ function twitter_pull_retrieve($twitkey, $num_items = NULL) {
   else {
     try {
       $puller = new twitter_puller($twitkey, $num_items);
+      $puller->rts = $rts;
+      $puller->exclude_replies = $exclude_replies;
       $puller->get_items();
       $tweets = $puller->tweets;
     }
@@ -172,6 +178,34 @@ function twitter_pull_block($op = 'list', $delta = 0, $edit = array()) {
   }
 }
 
+/**
+ * Implements hook_ctools_plugin_api().
+ */
+function twitter_pull_ctools_plugin_api($module, $api) {
+  if ($module == 'boxes' && $api == 'plugins') {
+    return array('version' => 1);
+  }
+}
+
+/**
+ * Implements hook_boxes_plugins().
+ */
+function twitter_pull_boxes_plugins() {
+  $info = array();
+  $path = drupal_get_path('module', 'twitter_pull') . '/plugins';
+  $info['twitter'] = array(
+    'title' => 'Twitter Box',
+    'handler' => array(
+      'parent' => 'box',
+      'class' => 'twitter_pull_box',
+      'file' => 'twitter_pull_box.inc',
+      'path' => $path,
+    ),
+  );
+  return $info;
+}
+
+
 
 /* 
  * data hook for twitter_pull blocks.  
@@ -207,9 +241,6 @@ function twitter_pull_block_data() {
   
   return $data;
 }
-
-
-
 
 /****** FOR TESTING ONLY. KEEP DISABLED AT ALL TIMES UNLESS DEBUGGING ******/
 

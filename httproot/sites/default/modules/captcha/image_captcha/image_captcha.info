@@ -4,9 +4,9 @@ package = "Spam control"
 dependencies[] = captcha
 core = 6.x
 
-; Information added by drupal.org packaging script on 2012-07-27
-version = "6.x-2.4+21-dev"
+; Information added by Drupal.org packaging script on 2015-09-08
+version = "6.x-2.7"
 core = "6.x"
 project = "captcha"
-datestamp = "1343347727"
+datestamp = "1441724640"
 

@@ -89,8 +89,8 @@ function disqus_migrate_cron() {
   }
 
   // Run sync
-  module_load_include('inc', 'disqus_migrate', 'disqus_migrate.admin');
-  
+  module_load_include('inc', 'disqus_migrate', 'include/disqus_migrate.import');
+
   $last_synced_time = _disqus_migrate_last_synced_time();
   
   _disqus_migrate_import($last_synced_time + 1);

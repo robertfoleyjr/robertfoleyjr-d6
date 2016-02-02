@@ -3,9 +3,9 @@ description = "Provides a views plugin that allows fields to be included in RSS 
 package = Views
 dependencies[] = views
 core = "6.x"
-; Information added by drupal.org packaging script on 2012-05-02
-version = "6.x-2.0-rc3"
+; Information added by Drupal.org packaging script on 2014-12-23
+version = "6.x-2.0-rc4"
 core = "6.x"
 project = "views_rss"
-datestamp = "1335990385"
+datestamp = "1419363789"
 

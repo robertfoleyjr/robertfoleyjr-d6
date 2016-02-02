@@ -1,3 +1,10 @@
+/** next line and line 287 edited by @rudiedirkx **/
+tr.odd:hover td, tr.even:hover td { background-color:#eee; }
+
+
+
+
+
 p:last-child { margin:0px; }
 
 hr { display:none; }
@@ -262,6 +269,19 @@ table .form-item {
 
   .page-content .form-item:hover > .description { display:block; }
 
+/* Date module fix */                                                                                
+.page-content div.date-clear div.description {                                                       
+  position: relative;                                                                                
+  top: 0;                                                                                            
+  left: 0;                                                                                           
+  background: none;                                                                                  
+  width: auto;                                                                                       
+  margin: 0;                                                                                         
+  padding: 0;                                                                                        
+  display: block;                                                                                    
+  border: 0px;                                                                                       
+}
+
 input.teaser-button,
 input.form-submit {
   cursor:pointer;
@@ -277,7 +297,7 @@ input.form-submit {
   background:#f4f4f4 url(images/bleeds.png) 0px -41px repeat-x;
   }
 
-  input.form-submit:hover {
+  input.form-submit:hover, input.form-submit:focus {
     border-color:#999 #999 #888;
     background:#888 url(images/bleeds.png) 0px 0px repeat-x;
     color:#fff;

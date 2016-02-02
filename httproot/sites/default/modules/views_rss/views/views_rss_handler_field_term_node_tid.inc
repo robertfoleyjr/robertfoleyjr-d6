@@ -81,19 +81,21 @@ class views_rss_handler_field_term_node_tid extends views_handler_field_term_nod
     // For "RSS <category> element" display type make sure
     // that field value will never be rendered as link.
     if ($this->options['type'] == 'rss_category') {
-      foreach ($this->items as $node_nid => $terms) {
-        foreach ($terms as $term_tid => $term) {
-          if (isset($term['make_link'])) {
-            $this->items[$node_nid][$term_tid]['make_link'] = FALSE;
-          }
-          if ($this->options['rss_domain'] != 'none' && empty($this->options['link_to_taxonomy'])) {
-            $this->items[$node_nid][$term_tid]['path'] = 'taxonomy/term/' . $term['tid'];
-          }
-          if ($this->options['rss_include_parents']) {
-            $this->items[$node_nid][$term_tid]['parents'] = taxonomy_get_parents_all($term_tid);
-          }
-          if ($this->options['rss_include_vocabulary']) {
-            $this->items[$node_nid][$term_tid]['vocabulary'] = $term['vocabulary'];
+      if (!empty($this->items)) {
+        foreach ($this->items as $node_nid => $terms) {
+          foreach ($terms as $term_tid => $term) {
+            if (isset($term['make_link'])) {
+              $this->items[$node_nid][$term_tid]['make_link'] = FALSE;
+            }
+            if ($this->options['rss_domain'] != 'none' && empty($this->options['link_to_taxonomy'])) {
+              $this->items[$node_nid][$term_tid]['path'] = 'taxonomy/term/' . $term['tid'];
+            }
+            if ($this->options['rss_include_parents']) {
+              $this->items[$node_nid][$term_tid]['parents'] = taxonomy_get_parents_all($term_tid);
+            }
+            if ($this->options['rss_include_vocabulary']) {
+              $this->items[$node_nid][$term_tid]['vocabulary'] = $term['vocabulary'];
+            }
           }
         }
       }

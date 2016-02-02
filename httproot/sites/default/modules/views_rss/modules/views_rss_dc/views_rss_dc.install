@@ -9,6 +9,8 @@
  * Implementation of hook_install().
  */
 function views_rss_dc_install() {
+  drupal_load('module', 'views_rss_dc');
+  views_rss_dc_update_6200();
   cache_clear_all('views_rss:', 'cache_views', TRUE);
 }
 

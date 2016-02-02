@@ -1,5 +1,4 @@
 <?php
-// $Id: modalframe.module,v 1.1.2.12 2010/04/23 07:32:15 markuspetrux Exp $
 
 /**
  * @file
@@ -90,6 +89,11 @@ function modalframe_preprocess_page(&$variables) {
       $variables['template_files'] = array();
     }
     $variables['template_files'][] = 'modalframe-page';
+    
+    // If a title is set we need to assure that it is filtered.
+    if (isset($variables['title'])) {
+      $variables['title'] = check_plain($variables['title']);
+    }
   }
 }
 

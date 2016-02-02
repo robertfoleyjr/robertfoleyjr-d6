@@ -81,7 +81,7 @@ function disqus_migrate_admin_export() {
 function _disqus_migrate_export_api_validate($form, &$form_state) {
   // Check for existance of Disqus API
   if (!file_exists('sites/all/libraries/disqusapi/disqusapi.php')) {
-    form_set_error('', t('Your secret key must be entered before using this export functionality. Please get your application API keys from Disqus and enter them in the "Advanced" fieldset below. Also ensure that you have authenticated with Disqus.'));
+    form_set_error('', t('Download the <a href="@disqusapiurl">PHP API implementation here</a> and upload the disqusapi folder to your sites/all/libraries folder. Also ensure that you have authenticated with Disqus.', array('@disqusapiurl' => url('https://github.com/disqus/disqus-php', array('absolute' => TRUE)))));
   }
   
   // Make sure secret key is filled out
@@ -253,7 +253,7 @@ function _disqus_migrate_export_wxr($form, &$form_state) {
       $output .= '<title>' . _disqus_migrate_cleanse_xml($thread['title']) . '</title>';
       $output .= '<link>' . $thread['link'] . '</link>';
       $output .= '<content:encoded></content:encoded>';
-      $output .= '<dsq:identifier>' . $thread['identifier'] . '</dsq:identifier>';
+      $output .= '<dsq:thread_identifier>' . $thread['identifier'] . '</dsq:thread_identifier>';
       $output .= '<wp:post_date_gmt>' . $thread['post_date_gmt'] . '</wp:post_date_gmt>';
       $output .= '<wp:comment_status>open</wp:comment_status>';
       
@@ -306,7 +306,10 @@ function _disqus_migrate_export_wxr($form, &$form_state) {
 function _disqus_migrate_export_gather($select_all = FALSE) {
   // Select all the nodes with comments
   $thread_data = array();
-  
+
+  // Make sure the dates are exported in GMT time as expected by Disqus
+  date_default_timezone_set('GMT');
+
   // Get max amount of comments to gather
   $export_threshold = variable_get('disqus_migrate_export_api_limit', 100);
   $comments_gathered = 0;
@@ -417,14 +420,14 @@ function _disqus_migrate_cleanse_xml($string) {
     '"',
     "'",
   );
-  
+
   $replace = array(
     '&gt;',
     '&lt;',
     '&amp;',
-    '&apos;',
     '&quot;',
+    '&apos;',
   );
-  
+
   return str_replace($find, $replace, $string);
 }

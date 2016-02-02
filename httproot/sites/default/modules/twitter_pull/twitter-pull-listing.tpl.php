@@ -32,9 +32,9 @@
     <?php foreach ($tweets as $tweet_key => $tweet): ?>
       <li>
         <div class="tweet-authorphoto"><img src="<?php print $tweet->userphoto; ?>" alt="<?php print $tweet->username; ?>" /></div>
-        <span class="tweet-author"><?php print l($tweet->username, 'http://twitter.com/' . $tweet->username); ?></span>
+        <span class="tweet-author"><?php print l($tweet->username, 'http://twitter.com/' . $tweet->screenname); ?></span>
         <span class="tweet-text"><?php print twitter_pull_add_links($tweet->text); ?></span>
-        <div class="tweet-time"><?php print l($tweet->time_ago, 'http://twitter.com/' . $tweet->username . '/status/' . $tweet->id);?></div>
+        <div class="tweet-time"><?php print l($tweet->time_ago, 'http://twitter.com/' . $tweet->screenname . '/status/' . $tweet->id);?></div>
 
         <?php if ($tweet_key < $tweet_count - 1): ?>
           <div class="tweet-divider"></div>

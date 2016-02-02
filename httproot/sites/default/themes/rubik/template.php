@@ -523,6 +523,9 @@ function rubik_filter_form($form) {
       $select .= drupal_render($form[$key]);
     }
   }
+  if (!$select) {
+    $select = drupal_render($form['format']);
+  }
   $help = theme('filter_tips_more_info');
   $output = "<div class='filter-options clear-block'>{$select}{$help}</div>";
   return $output;
@@ -596,6 +599,19 @@ function _rubik_icon_classes($path) {
  */
 function _rubik_filter_form_alter(&$form) {
   $found = FALSE;
+  $multiple_fields = FALSE;
+
+  // Unlimited value CCK fields should not be altered
+  // to avoid breaking the AHAH drag n drop and 'Add more'
+  // functionality.
+  if (isset($form['#field_name'])) {
+    $field_name = $form['#field_name'];
+    $field = content_fields($field_name);
+    if ($field['multiple'] > 0) {
+      $multiple_fields = TRUE;
+    }
+  }
+
   foreach (element_children($form) as $id) {
     // Filter form element found
     if (
@@ -603,12 +619,18 @@ function _rubik_filter_form_alter(&$form) {
       is_array($form[$id]['#element_validate']) &&
       in_array('filter_form_validate', $form[$id]['#element_validate'])
     ) {
+      if ($multiple_fields === TRUE) {
+        continue;
+      }
       $form[$id]['#type'] = 'markup';
       $form[$id]['#theme'] = 'filter_form';
       $found = TRUE;
     }
     // Formatting guidelines element found
     elseif ($id == 'format' && !empty($form[$id]['format']['guidelines'])) {
+      if ($multiple_fields === TRUE) {
+        continue;
+      }
       $form[$id]['#theme'] = 'filter_form';
       $found = TRUE;
     }

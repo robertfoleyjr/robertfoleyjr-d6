@@ -3,9 +3,9 @@ description = "Provides a filter to highlight source code using the GeSHi librar
 package = "Filters"
 core = 6.x
 
-; Information added by drupal.org packaging script on 2013-01-29
-version = "6.x-1.4+4-dev"
+; Information added by drupal.org packaging script on 2013-03-18
+version = "6.x-1.5"
 core = "6.x"
 project = "geshifilter"
-datestamp = "1359421709"
+datestamp = "1363644611"
 

@@ -63,7 +63,7 @@ function disqus_menu() {
     'access arguments' => array('administer disqus'),
     'page callback' => '_disqus_oauth_callback',
     'file' => 'disqus.admin.inc',
-    'type' => MENU_CALLBACK, 
+    'type' => MENU_CALLBACK,
   );
   */
   return $items;
@@ -101,7 +101,7 @@ function disqus_nodeapi(&$node, $op, $a3 = NULL, $a4 = NULL) {
             ));
 
             // Build the title.
-            $node->disqus['title'] = check_plain($node->title);
+            $node->disqus['title'] = check_plain(strip_tags($node->title));
 
             // Provide the identifier.
             $node->disqus['identifier'] = 'node/' . $node->nid;
@@ -214,7 +214,7 @@ function disqus_user($op, &$edit, &$account, $category = NULL) {
         ));
 
         // Build the title.
-        $account->disqus['title'] = check_plain($account->name);
+        $account->disqus['title'] = check_plain(strip_tags($account->name));
 
         // Provide the identifier.
         $account->disqus['identifier'] = 'user/' . $account->uid;
@@ -359,26 +359,26 @@ function disqus_block($op = 'list', $delta = 0, $edit = array()) {
       switch ($delta) {
       case 'disqus_recent_comments':
         $content = <<<EOT
-<div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/$domain/recent_comments_widget.js?num_items=$num_items$avatars"></script></div>
+<div id="dsq-recentcomments" class="dsq-widget"><script type="text/javascript" src="//disqus.com/forums/$domain/recent_comments_widget.js?num_items=$num_items$avatars"></script></div>
 EOT;
         $subject = t('Recent Comments');
       break;
       case 'disqus_popular_threads':
         $subject = t('Popular Threads');
         $content = <<<EOT
-<div id="dsq-popthreads" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/$domain/popular_threads_widget.js?num_items=$num_items"></script></div>
+<div id="dsq-popthreads" class="dsq-widget"><script type="text/javascript" src="//disqus.com/forums/$domain/popular_threads_widget.js?num_items=$num_items"></script></div>
 EOT;
       break;
       case 'disqus_top_commenters':
         $subject = t('Top Commenters');
         $content = <<<EOT
-<div id="dsq-topcommenters" class="dsq-widget"><script type="text/javascript" src="http://disqus.com/forums/$domain/top_commenters_widget.js?num_items=$num_items$avatars"></script></div>
+<div id="dsq-topcommenters" class="dsq-widget"><script type="text/javascript" src="//disqus.com/forums/$domain/top_commenters_widget.js?num_items=$num_items$avatars"></script></div>
 EOT;
       break;
       case 'disqus_combination_widget':
         $subject = t('Comments');
         $content = <<<EOT
-<script type="text/javascript" src="http://disqus.com/forums/$domain/combination_widget.js?num_items=$num_items&amp;color=$color&amp;default_tab=$default_tab"></script>
+<script type="text/javascript" src="//disqus.com/forums/$domain/combination_widget.js?num_items=$num_items&amp;color=$color&amp;default_tab=$default_tab"></script>
 EOT;
       break;
       case 'disqus_comments':
@@ -613,7 +613,7 @@ function disqus($user_api_key = NULL, $forum_api_key = NULL) {
 function disqus_cron() {
   $oauth_expires = variable_get('disqus_oauth_expires_on', '');
   if (!empty($oauth_expires)) {
-  
+
     // Check to see if we should renew the access tokens yet
     $buffer = 259200; // 3 day buffer
     if (time() + $buffer > $oauth_expires) {
@@ -624,7 +624,7 @@ function disqus_cron() {
         'client_secret' => variable_get('disqus_secretkey', ''),
         'refresh_token' => variable_get('disqus_oauth_refresh_token', ''),
       );
-      
+
       module_load_include('admin.inc', 'disqus', 'disqus');
       _disqus_oath_request_access_token($parameters);
     }

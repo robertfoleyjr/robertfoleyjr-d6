@@ -1,0 +1,7 @@
+Disqus 6.x-1.x
+---------------------------------
+- Issue #1904598 by konstantin.komelin, Mixologic: Add https support.
+- Issue #2141145 by valdo: Mismatched apostrophe and quote replacement in XML export.
+- Issue #2141185 by valdo: XML export: replace deprecated dsq:identifier tag with dsq:thread_identifier tag.
+- Issue #2141229 by valdo: XML export: datetimes should be exported in GMT.
+- Issue #2141257 by valdo: D6 migrate: don't include disqus_migrate.admin.inc as this file was removed.

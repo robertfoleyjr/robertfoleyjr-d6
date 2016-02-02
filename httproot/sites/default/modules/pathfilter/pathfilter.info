@@ -3,9 +3,9 @@ description = "Input filter to convert internal paths, such as &quot;internal:no
 package = Input filters
 core = 6.x
 
-; Information added by drupal.org packaging script on 2011-05-03
-version = "6.x-2.x-dev"
+; Information added by drupal.org packaging script on 2013-10-01
+version = "6.x-2.0-beta2+14-dev"
 core = "6.x"
 project = "pathfilter"
-datestamp = "1304382000"
+datestamp = "1380622462"
 

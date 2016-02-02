@@ -513,8 +513,10 @@ function themekey_properties_dummy2time($dummy) {
  *   current user's browser as string
  */
 function themekey_properties_dummy2user_browser($dummy) {
-  module_load_include('php', 'themekey_properties', 'browser_detection');
-  return BrowserDetection::getBrowser($_SERVER['HTTP_USER_AGENT']);
+  if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+    module_load_include('php', 'themekey_properties', 'browser_detection');
+    return BrowserDetection::getBrowser($_SERVER['HTTP_USER_AGENT']);
+  }
 }
 
 
@@ -533,8 +535,10 @@ function themekey_properties_dummy2user_browser($dummy) {
  *   current user's operating system as string
  */
 function themekey_properties_dummy2user_os($dummy) {
-  module_load_include('php', 'themekey_properties', 'browser_detection');
-  return BrowserDetection::getOs($_SERVER['HTTP_USER_AGENT']);
+  if (!empty($_SERVER['HTTP_USER_AGENT'])) {
+    module_load_include('php', 'themekey_properties', 'browser_detection');
+    return BrowserDetection::getOs($_SERVER['HTTP_USER_AGENT']);
+  }
 }
 
 
@@ -596,7 +600,7 @@ function themekey_properties_dummy2session($dummy) {
   if (!empty($_SESSION)) {
     foreach ($_SESSION as $key => $value) {
       if (is_bool($value)) {
-        $filtered_params[] = $key . '=' . ($value) ? '1' : '0';
+        $filtered_params[] = $key . '=' . ($value ? '1' : '0');
       }
       elseif (!empty($value) && (is_numeric($value) || is_string($value))) {
         $filtered_params[] = $key . '=' . $value;

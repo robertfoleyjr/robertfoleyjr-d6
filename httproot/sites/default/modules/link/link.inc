@@ -28,28 +28,37 @@ function _link_process(&$item, $delta = 0, $field, $node) {
   // Don't save an invalid default value (e.g. 'http://').
   if ((isset($field['widget']['default_value'][$delta]['url']) && $item['url'] == $field['widget']['default_value'][$delta]['url']) && is_object($node)) {
     if (!link_validate_url($item['url'])) {
-      unset($item['url']);
+      $item['url'] = NULL;
     }
+  }
+  
+  // If we don't have a title, then set it to null.
+  if (!isset($item['title'])) {
+    $item['title'] = NULL;
   }
 }
 
 function _link_validate(&$item, $delta, $field, $node, &$optional_field_found) {
-  if ($item['url'] && !(isset($field['widget']['default_value'][$delta]['url']) && $item['url'] == $field['widget']['default_value'][$delta]['url'] && !$field['required'])) {
+
+  // neither of these keys are certain to be set
+  $test = $item + array('url' => NULL, 'title' => NULL);
+
+  if ($test['url'] && !(isset($field['widget']['default_value'][$delta]['url']) && $test['url'] == $field['widget']['default_value'][$delta]['url'] && !$field['required'])) {
     // Validate the link.
-    if (link_validate_url(trim($item['url'])) == FALSE) {
+    if (link_validate_url(trim($test['url'])) == FALSE) {
       form_set_error($field['field_name'] .']['. $delta .'][url', t('Not a valid URL.'));
     }
     // Require a title for the link if necessary.
-    if ($field['title'] == 'required' && strlen(trim($item['title'])) == 0) {
+    if ($field['title'] == 'required' && strlen(trim($test['title'])) == 0) {
       form_set_error($field['field_name'] .']['. $delta .'][title', t('Titles are required for all links.'));
     }
   }
   // Require a link if we have a title.
-  if ($field['form_id'] != 'content_field_edit_form' && $field['url'] !== 'optional' && strlen($item['title']) > 0 && strlen(trim($item['url'])) == 0) {
+  if ((!isset($field['form_id']) || $field['form_id'] != 'content_field_edit_form') && $field['url'] !== 'optional' && strlen($test['title']) > 0 && strlen(trim($test['url'])) == 0) {
     form_set_error($field['field_name'] .']['. $delta .'][url', t('You cannot enter a title without a link url.'));
   }
   // In a totally bizzaro case, where URLs and titles are optional but the field is required, ensure there is at least one link.
-  if ($field['url'] == 'optional' && $field['title'] == 'optional' && (strlen(trim($item['url'])) != 0 || strlen(trim($item['title'])) != 0)) {
+  if ($field['url'] == 'optional' && $field['title'] == 'optional' && (strlen(trim($test['url'])) != 0 || strlen(trim($test['title'])) != 0)) {
     $optional_field_found = TRUE;
   }
 }
@@ -107,7 +116,7 @@ function _link_sanitize(&$item, $delta, &$field, &$node) {
 
   // Create a shortened URL for display.
   $display_url = $type == LINK_EMAIL ? str_replace('mailto:', '', $url) : url($url, array('query' => isset($item['query']) ? $item['query'] : NULL, 'fragment' => isset($item['fragment']) ? $item['fragment'] : NULL, 'absolute' => TRUE));
-  if (is_array($field['display']) && isset($field['display']['url_cutoff']) && strlen($display_url) > $field['display']['url_cutoff']) {
+  if (is_array($field['display']) && !empty($field['display']['url_cutoff']) && strlen($display_url) > $field['display']['url_cutoff']) {
     $display_url = substr($display_url, 0, $field['display']['url_cutoff']) ."...";
   }
   $item['display_url'] = $display_url;
@@ -152,15 +161,22 @@ function _link_sanitize(&$item, $delta, &$field, &$node) {
   $item['attributes'] = array_filter($item['attributes']);
   $item['attributes'] += $field['attributes'];
 
-  // If user is not allowed to choose target attribute, use default defined at
-  // field level.
-  if ($field['attributes']['target'] != LINK_TARGET_USER) {
-    $item['attributes']['target'] = $field['attributes']['target'];
-  }
-
-  // Remove the target attribute if the default (no target) is selected.
-  if (empty($item['attributes']) || $item['attributes']['target'] == LINK_TARGET_DEFAULT) {
+  if (empty($item['attributes'])) {
     unset($item['attributes']['target']);
+  }
+  switch ($field['attributes']['target']) {
+    case LINK_TARGET_DEFAULT:
+      unset($item['attributes']['target']);
+      break;
+    case LINK_TARGET_USER:
+      // '_blank' is the only authorized value for target in this version.
+      if ($item['attributes']['target'] != '_blank') {
+        unset($item['attributes']['target']);
+      }
+      break;
+    default: // LINK_TARGET_NEW_WINDOW and LINK_TARGET_TOP
+      $item['attributes']['target'] = $field['attributes']['target'];
+      break;
   }
 
   // Remove the rel=nofollow for internal links.
@@ -182,6 +198,12 @@ function _link_sanitize(&$item, $delta, &$field, &$node) {
   // Remove title attribute if it's equal to link text.
   if ($item['attributes']['title'] == $item['display_title']) {
     unset($item['attributes']['title']);
+  }
+
+  // Hide the display title the URL is empty and the "Hide title if URL is
+  // empty" has been checked.
+  if (empty($item['url']) && isset($field['title_value_visibility']) && $field['title_value_visibility'] == 1) {
+    unset($item['display_title']);
   }
 
   // Remove empty attributes.

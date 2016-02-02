@@ -1,7 +1,8 @@
-ThemeKey 6.x-4.1, 2012-xx-xx
+ThemeKey 6.x-4.1, 2013-11-20
 ----------------------------
 [#1792198] psynaptic: Invalid multibyte sequence in themekey_validators.inc
 [#1842066] netw3rker, mkalkbrenner: fixed regex for scanning modules
+[#1851474] mkalkbrenner: JS error on empty Theme Switching Rule Chain
 
 
 ThemeKey 6.x-4.0, 2012-01-19

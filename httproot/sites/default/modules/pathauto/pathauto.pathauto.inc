@@ -79,7 +79,10 @@ function node_pathauto_bulk_update_batch_process(&$context) {
   $context['sandbox']['current'] = max($nids);
   $context['message'] = t('Updated alias for node @nid.', array('@nid' => end($nids)));
 
-  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+  if ($context['sandbox']['count'] >= $context['sandbox']['total']) {
+    $context['finished'] = 1;
+  }
+  else {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
   }
 }
@@ -152,7 +155,10 @@ function taxonomy_pathauto_bulk_update_batch_process(&$context) {
   $context['sandbox']['current'] = max($tids);
   $context['message'] = t('Updated alias for term @tid.', array('@tid' => end($tids)));
 
-  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+  if ($context['sandbox']['count'] >= $context['sandbox']['total']) {
+    $context['finished'] = 1;
+  }
+  else {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
   }
 }
@@ -213,7 +219,10 @@ function forum_pathauto_bulk_update_batch_process(&$context) {
   $context['sandbox']['current'] = max($tids);
   $context['message'] = t('Updated alias for forum @tid.', array('@tid' => end($tids)));
 
-  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+  if ($context['sandbox']['count'] >= $context['sandbox']['total']) {
+    $context['finished'] = 1;
+  }
+  else {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
   }
 }
@@ -273,7 +282,10 @@ function user_pathauto_bulk_update_batch_process(&$context) {
   $context['sandbox']['current'] = max($uids);
   $context['message'] = t('Updated alias for user @uid.', array('@uid' => end($uids)));
 
-  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+  if ($context['sandbox']['count'] >= $context['sandbox']['total']) {
+    $context['finished'] = 1;
+  }
+  else {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
   }
 }
@@ -334,7 +346,10 @@ function blog_pathauto_bulk_update_batch_process(&$context) {
   $context['sandbox']['current'] = max($uids);
   $context['message'] = t('Updated alias for blog user @uid.', array('@uid' => end($uids)));
 
-  if ($context['sandbox']['count'] != $context['sandbox']['total']) {
+  if ($context['sandbox']['count'] >= $context['sandbox']['total']) {
+    $context['finished'] = 1;
+  }
+  else {
     $context['finished'] = $context['sandbox']['count'] / $context['sandbox']['total'];
   }
 }
